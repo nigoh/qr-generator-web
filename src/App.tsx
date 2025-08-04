@@ -13,17 +13,20 @@ import { FileText, Palette, Settings, Image } from 'lucide-react';
 
 const QRGeneratorApp: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      <Header />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      {/* 固定ヘッダー */}
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <Header />
+      </div>
 
-      {/* メインレイアウト: 画面全体表示、レスポンシブ対応 */}
-      <div className="flex-1">
+      {/* メインコンテンツ: ヘッダーとフッターの間 */}
+      <div className="pt-16 pb-20">
         <div className="w-full max-w-none mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
-          <div className="min-h-[calc(100vh-64px)] flex flex-col xl:flex-row gap-4 lg:gap-6 py-4">
+          <div className="min-h-[calc(100vh-144px)] flex flex-col xl:flex-row gap-4 lg:gap-6 py-4">
             
             {/* 左側: QRプレビューエリア */}
             <div className="w-full xl:w-2/5 order-1 xl:order-1">
-              <div className="sticky top-4">
+              <div className="sticky top-20">
                 <Card className="shadow-lg border-2">
                   <CardHeader className="pb-4">
                     <CardTitle className="text-center text-lg sm:text-xl font-bold">
@@ -114,7 +117,10 @@ const QRGeneratorApp: React.FC = () => {
         </div>
       </div>
 
-      <Footer />
+      {/* 固定フッター */}
+      <div className="fixed bottom-0 left-0 right-0 z-50">
+        <Footer />
+      </div>
     </div>
   );
 };
