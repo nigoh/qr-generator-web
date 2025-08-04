@@ -114,3 +114,20 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ツアー機能専用のスタイル */
+@layer utilities {
+  .tour-no-scroll {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    touch-action: none !important;
+    overscroll-behavior: none !important;
+  }
+  
+  .tour-overlay {
+    pointer-events: all !important;
+    touch-action: none !important;
+    overscroll-behavior: none !important;
+  }
+}

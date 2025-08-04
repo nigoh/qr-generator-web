@@ -9,6 +9,7 @@ import { QRPreview } from './components/qr/QRPreview';
 import { DownloadButton } from './components/qr/DownloadButton';
 import { CollapsibleSection } from './components/ui/CollapsibleSection';
 import { Card, CardHeader, CardTitle, CardContent } from './components/ui/card';
+import { TourGuide } from './components/tour/TourGuide';
 import { FileText, Palette, Image } from 'lucide-react';
 
 const QRGeneratorApp: React.FC = () => {
@@ -37,7 +38,7 @@ const QRGeneratorApp: React.FC = () => {
                     <div className="w-full max-w-sm">
                       <QRPreview />
                     </div>
-                    <div className="w-full max-w-sm">
+                    <div className="w-full max-w-sm" data-tour="download-button">
                       <DownloadButton />
                     </div>
                   </CardContent>
@@ -63,6 +64,7 @@ const QRGeneratorApp: React.FC = () => {
                       </div>
                     } 
                     defaultOpen
+                    data-tour="basic-settings"
                   >
                     <div className="space-y-4">
                       <UrlInput />
@@ -79,6 +81,7 @@ const QRGeneratorApp: React.FC = () => {
                       </div>
                     } 
                     defaultOpen
+                    data-tour="style-settings"
                   >
                     <StyleSettingsForm />
                   </CollapsibleSection>
@@ -91,6 +94,7 @@ const QRGeneratorApp: React.FC = () => {
                         ロゴ埋め込み
                       </div>
                     }
+                    data-tour="logo-settings"
                   >
                     <LogoSettingsForm />
                   </CollapsibleSection>
@@ -105,6 +109,9 @@ const QRGeneratorApp: React.FC = () => {
       <div className="fixed bottom-0 left-0 right-0 z-50">
         <Footer />
       </div>
+
+      {/* ツアーガイド */}
+      <TourGuide />
     </div>
   );
 };

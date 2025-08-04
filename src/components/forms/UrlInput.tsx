@@ -12,7 +12,7 @@ export const UrlInput: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-tour="url-input">
       <div>
         <Label htmlFor="url-input">
           URL または テキスト

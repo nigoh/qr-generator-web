@@ -63,7 +63,7 @@ export const QRPreview: React.FC = () => {
   ]);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" data-tour="qr-preview">
       {/* 生成状態 */}
       {isGenerating && (
         <div className="flex items-center justify-center space-x-3 text-blue-600 bg-blue-50 border border-blue-200 rounded-lg py-2">

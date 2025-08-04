@@ -6,6 +6,7 @@ interface CollapsibleSectionProps {
   children: React.ReactNode;
   defaultOpen?: boolean;
   className?: string;
+  'data-tour'?: string;
 }
 
 export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
@@ -13,11 +14,15 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   children,
   defaultOpen = false,
   className,
+  'data-tour': dataTour,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className={clsx('border border-gray-200 rounded-lg overflow-hidden', className)}>
+    <div 
+      className={clsx('border border-gray-200 rounded-lg overflow-hidden', className)}
+      data-tour={dataTour}
+    >
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 text-left flex items-center justify-between transition-colors duration-200"
