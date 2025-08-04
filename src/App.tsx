@@ -9,7 +9,7 @@ import { QRPreview } from './components/qr/QRPreview';
 import { DownloadButton } from './components/qr/DownloadButton';
 import { CollapsibleSection } from './components/ui/CollapsibleSection';
 import { Card, CardHeader, CardTitle, CardContent } from './components/ui/card';
-import { FileText, Palette, Settings, Image } from 'lucide-react';
+import { FileText, Palette, Image } from 'lucide-react';
 
 const QRGeneratorApp: React.FC = () => {
   return (
@@ -87,28 +87,12 @@ const QRGeneratorApp: React.FC = () => {
                   <CollapsibleSection 
                     title={
                       <div className="flex items-center gap-2">
-                        <Settings className="w-5 h-5" />
-                        高度な設定
+                        <Image className="w-5 h-5" />
+                        ロゴ埋め込み
                       </div>
                     }
                   >
-                    <div className="space-y-6">
-                      <div className="border-b pb-4">
-                        <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
-                          <Settings className="w-5 h-5" />
-                          QRコード設定
-                        </h3>
-                        <BasicSettingsForm />
-                      </div>
-                      
-                      <div>
-                        <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
-                          <Image className="w-5 h-5" />
-                          ロゴ埋め込み
-                        </h3>
-                        <LogoSettingsForm />
-                      </div>
-                    </div>
+                    <LogoSettingsForm />
                   </CollapsibleSection>
                 </CardContent>
               </Card>
