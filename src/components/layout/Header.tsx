@@ -1,10 +1,7 @@
 import React from 'react';
-import { QrCode, Github, HelpCircle } from 'lucide-react';
-import { Button } from '../ui';
-import { useTourStore } from '../../store/tourStore';
+import { QrCode, Github } from 'lucide-react';
 
 export const Header: React.FC = () => {
-  const startTour = useTourStore((state) => state.startTour);
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -29,16 +26,6 @@ export const Header: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={startTour}
-              className="text-gray-500 hover:text-gray-700"
-              aria-label="使い方ガイド"
-            >
-              <HelpCircle className="w-5 h-5" />
-              <span className="hidden sm:inline ml-2">使い方</span>
-            </Button>
             <a
               href="https://github.com"
               target="_blank"

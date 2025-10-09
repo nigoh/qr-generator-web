@@ -33,10 +33,8 @@ export const DownloadButton: React.FC = () => {
 
       // ダウンロード
       const link = document.createElement('a');
-      const timestamp = new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace(/[-:T]/g, '');
+      const iso = new Date().toISOString().slice(0, 19);
+      const timestamp = iso.replaceAll('-', '').replaceAll(':', '').replace('T', '');
       link.download = `qrcode_${timestamp}.${format}`;
 
       if (format === 'jpg') {

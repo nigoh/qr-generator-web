@@ -9,8 +9,6 @@ import { QRPreview } from './components/qr/QRPreview';
 import { DownloadButton } from './components/qr/DownloadButton';
 import { CollapsibleSection } from './components/ui/CollapsibleSection';
 import { Card, CardHeader, CardTitle, CardContent } from './components/ui/card';
-import { TourGuide } from './components/tour/TourGuide';
-import { ComponentTour } from './components/tour/ComponentTour';
 import { FileText, Palette, Image } from 'lucide-react';
 
 const QRGeneratorApp: React.FC = () => {
@@ -112,8 +110,6 @@ const QRGeneratorApp: React.FC = () => {
       </div>
 
       {/* ツアーガイド */}
-      <TourGuide />
-      <ComponentTour />
     </div>
   );
 };
