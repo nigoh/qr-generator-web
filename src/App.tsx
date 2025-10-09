@@ -26,29 +26,8 @@ const QRGeneratorApp: React.FC = () => {
         <div className="w-full max-w-none mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
           <div className="min-h-[calc(100vh-144px)] flex flex-col xl:flex-row gap-4 lg:gap-6 py-4">
             
-            {/* 左側: QRプレビューエリア */}
-            <div className="w-full xl:w-2/5 order-1 xl:order-1">
-              <div className="sticky top-20">
-                <Card className="shadow-lg border-2">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-center text-lg sm:text-xl font-bold">
-                      QRコードプレビュー
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex flex-col justify-center items-center space-y-4 py-6">
-                    <div className="w-full max-w-sm">
-                      <QRPreview />
-                    </div>
-                    <div className="w-full max-w-sm" data-tour="download-button">
-                      <DownloadButton />
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            {/* 右側: 設定項目（スクロール可能） */}
-            <div className="w-full xl:w-3/5 order-2 xl:order-2">
+            {/* 左側: 設定項目（スクロール可能） */}
+            <div className="w-full xl:w-3/5 order-1 xl:order-1">
               <Card className="min-h-full flex flex-col border shadow-sm">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg sm:text-xl font-bold">
@@ -101,6 +80,27 @@ const QRGeneratorApp: React.FC = () => {
                   </CollapsibleSection>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* 右側: QRプレビューエリア */}
+            <div className="w-full xl:w-2/5 order-2 xl:order-2">
+              <div className="sticky top-20">
+                <Card className="shadow-lg border-2">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-center text-lg sm:text-xl font-bold">
+                      QRコードプレビュー
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex flex-col justify-center items-center space-y-4 py-6">
+                    <div className="w-full max-w-sm">
+                      <QRPreview />
+                    </div>
+                    <div className="w-full max-w-sm" data-tour="download-button">
+                      <DownloadButton />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </div>
