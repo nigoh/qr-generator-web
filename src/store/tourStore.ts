@@ -168,6 +168,7 @@ export const useTourStore = create<TourState>((set, get) => ({
   
   endTour: () => {
     set({ isActive: false, currentStep: 0 });
+    // ツアー終了時はスクロールしない
   },
   
   nextStep: () => {
@@ -184,6 +185,7 @@ export const useTourStore = create<TourState>((set, get) => ({
         }, 300);
       }
     } else {
+      // ツアー完了時はactionを実行しない
       get().endTour();
     }
   },

@@ -57,6 +57,7 @@ export const TourStepImproved: React.FC<TourStepProps> = ({
   const [actualPosition, setActualPosition] = useState(step.position);
   const [error, setError] = useState<string | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const prevStepRef = useRef<number | null>(null); // 前のステップを記録
 
   // ターゲット要素の検索（リトライ機能付き）
   const findTargetElement = useCallback(
@@ -224,8 +225,8 @@ export const TourStepImproved: React.FC<TourStepProps> = ({
     }
   }, [targetPosition, tooltipPosition, actualPosition]);
 
-  // 位置更新関数の最適化
-  const updatePosition = useCallback(async () => {
+  // 位置更新関数の最適化（自動スクロール制御付き）
+  const updatePosition = useCallback(async (allowAutoScroll = false) => {
     try {
       setError(null);
       const targetElement = await findTargetElement(step.target);
@@ -264,32 +265,29 @@ export const TourStepImproved: React.FC<TourStepProps> = ({
       setTooltipPosition(tooltipPos);
       setActualPosition(finalPosition as 'top' | 'bottom' | 'left' | 'right');
 
-      // 自動スクロール（要素が見えない場合、または中央配置が必要な場合）
-      const elementRect = targetElement.getBoundingClientRect();
-      const isElementVisible = elementRect.top >= 0 && 
-                              elementRect.bottom <= window.innerHeight &&
-                              elementRect.left >= 0 && 
-                              elementRect.right <= window.innerWidth;
-      
-      // 特定のステップでは常に中央配置
-      const needsCenterAlign = step.target.includes('style-settings') || 
-                              step.target.includes('logo-settings') ||
-                              step.target.includes('basic-settings');
-      
-      if (!isElementVisible || needsCenterAlign) {
-        // より確実な中央配置
-        const scrollOptions: ScrollIntoViewOptions = {
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'center'
-        };
+      // 自動スクロールの制御（許可されている場合のみ実行）
+      if (allowAutoScroll) {
+        const elementRect = targetElement.getBoundingClientRect();
+        const isElementVisible = elementRect.top >= 50 && 
+                                elementRect.bottom <= window.innerHeight - 50 &&
+                                elementRect.left >= 0 && 
+                                elementRect.right <= window.innerWidth;
         
-        targetElement.scrollIntoView(scrollOptions);
-        
-        // スクロール完了後に位置を再計算（より長い待機時間）
-        setTimeout(() => {
-          updatePosition();
-        }, 800);
+        // より厳しい条件で自動スクロールを実行
+        if (!isElementVisible) {
+          const scrollOptions: ScrollIntoViewOptions = {
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'center'
+          };
+          
+          targetElement.scrollIntoView(scrollOptions);
+          
+          // スクロール完了後に位置を再計算（自動スクロールは無効化）
+          setTimeout(() => {
+            updatePosition(false);
+          }, 600);
+        }
       }
     } catch (err) {
       console.error('位置更新エラー:', err);
@@ -297,9 +295,9 @@ export const TourStepImproved: React.FC<TourStepProps> = ({
     }
   }, [step.target, step.position, findTargetElement, calculateTooltipPosition]);
 
-  // デバウンスされたイベントハンドラー
+  // デバウンスされたイベントハンドラー（自動スクロール無効）
   const debouncedUpdatePosition = useMemo(
-    () => debounce(updatePosition, 100),
+    () => debounce(() => updatePosition(false), 100),
     [updatePosition]
   );
 
@@ -324,7 +322,10 @@ export const TourStepImproved: React.FC<TourStepProps> = ({
   }, [onNext, onPrev, onClose, currentStepIndex]);
 
   useEffect(() => {
-    updatePosition();
+    // 初回および手動ステップ移動時のみ自動スクロールを実行
+    const isFirstLoad = prevStepRef.current !== currentStepIndex;
+    updatePosition(isFirstLoad);
+    prevStepRef.current = currentStepIndex;
     
     // イベントリスナーの最適化
     window.addEventListener('resize', debouncedUpdatePosition);
@@ -341,7 +342,7 @@ export const TourStepImproved: React.FC<TourStepProps> = ({
         clearTimeout(retryTimeoutRef.current);
       }
     };
-  }, [updatePosition, debouncedUpdatePosition, handleKeyDown]);
+  }, [updatePosition, debouncedUpdatePosition, handleKeyDown, currentStepIndex]);
 
   // エラー状態の表示
   if (error) {
