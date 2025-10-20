@@ -272,7 +272,7 @@ export const useQRStore = create<QRState>()(
   persist(
     (set) => ({
       // 初期値
-      url: 'https://forms.gle/kPV52yrysGV9QaHb9',
+      url: 'https://example.com',
       errorCorrection: 'H',
       fgColor: '#000000',
       bgColor: '#ffffff',

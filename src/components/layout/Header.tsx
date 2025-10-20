@@ -53,7 +53,7 @@ export const Header: React.FC<HeaderProps> = ({
               {isTourGuideOpen ? "ツールに戻る" : "ツアーを見る"}
             </Button>
             <a
-              href="https://github.com"
+              href="https://github.com/nigoh"
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"

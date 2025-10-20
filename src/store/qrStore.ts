@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { QRSettings, LogoSettings } from '../types/qr.types';
 
+// 汎用的な初期URL: 環境変数で上書き可能（未設定時は空）
+const DEFAULT_QR_URL: string = (import.meta.env.VITE_DEFAULT_QR_URL as string | undefined) ?? '';
+
 interface QRState {
   // 基本設定
   url: string;
@@ -44,11 +47,12 @@ interface QRState {
 export const useQRStore = create<QRState>()(
   persist(
     (set, get) => ({
-      // 初期値
-      url: 'https://forms.gle/kPV52yrysGV9QaHb9',
+      // 初期値（汎用URL）
+      url: DEFAULT_QR_URL,
       errorCorrection: 'H',
-      fgColor: '#000000',
-      bgColor: '#ffffff',
+      // デフォルト色: 高コントラストで目に優しい配色（Tailwind gray-900 on gray-50 相当）
+      fgColor: '#111827',
+      bgColor: '#F9FAFB',
       dotStyle: 'square',
       boxSize: 10,
       border: 4,
