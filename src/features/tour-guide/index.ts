@@ -1,0 +1,8 @@
+export * from "./types"
+export { defaultTourSteps } from "./data/steps"
+export { useTourGuide } from "./hooks/use-tour-guide"
+export { useTourProgress } from "./hooks/use-tour-progress"
+export { TourStepList } from "./components/tour-step-list"
+export { TourHighlightCard } from "./components/tour-highlight-card"
+export { TourActionBar } from "./components/tour-action-bar"
+export { TourReplayBanner } from "./components/tour-replay-banner"
