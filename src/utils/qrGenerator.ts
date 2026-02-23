@@ -231,6 +231,71 @@ const drawLogo = async (
 };
 
 /**
+ * SVG形式でQRコードを生成する
+ * ロゴ埋め込みには対応していない（ベクター形式のため）
+ */
+export const generateQRSVG = async (
+  text: string,
+  options: Pick<QRSettings, 'errorCorrection' | 'fgColor' | 'bgColor' | 'dotStyle' | 'boxSize' | 'border'>
+): Promise<string> => {
+  const qrMatrix = await generateQRMatrix(text, { errorCorrection: options.errorCorrection });
+  const { modules, size } = qrMatrix;
+  const { boxSize, border, fgColor, bgColor, dotStyle } = options;
+
+  const totalSize = (size + border * 2) * boxSize;
+  const paths: string[] = [];
+
+  for (let row = 0; row < size; row++) {
+    for (let col = 0; col < size; col++) {
+      if (!modules[row][col]) continue;
+
+      const x = (col + border) * boxSize;
+      const y = (row + border) * boxSize;
+
+      switch (dotStyle) {
+        case 'circle': {
+          const cx = x + boxSize / 2;
+          const cy = y + boxSize / 2;
+          const r = boxSize / 2;
+          paths.push(`<circle cx="${cx}" cy="${cy}" r="${r}" />`);
+          break;
+        }
+        case 'rounded': {
+          const r = boxSize * 0.2;
+          paths.push(
+            `<rect x="${x}" y="${y}" width="${boxSize}" height="${boxSize}" rx="${r}" ry="${r}" />`
+          );
+          break;
+        }
+        case 'diamond': {
+          const cx = x + boxSize / 2;
+          const cy = y + boxSize / 2;
+          const half = boxSize * 0.5;
+          paths.push(
+            `<polygon points="${cx},${cy - half} ${cx + half},${cy} ${cx},${cy + half} ${cx - half},${cy}" />`
+          );
+          break;
+        }
+        default: // square
+          paths.push(
+            `<rect x="${x}" y="${y}" width="${boxSize}" height="${boxSize}" />`
+          );
+      }
+    }
+  }
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     viewBox="0 0 ${totalSize} ${totalSize}"
+     width="${totalSize}" height="${totalSize}">
+  <rect width="${totalSize}" height="${totalSize}" fill="${bgColor}" />
+  <g fill="${fgColor}">
+    ${paths.join('\n    ')}
+  </g>
+</svg>`;
+};
+
+/**
  * QRコードを標準的な方法で生成（デバッグ用）
  */
 export const generateStandardQR = async (
