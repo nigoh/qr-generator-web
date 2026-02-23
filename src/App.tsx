@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react"
 import { FileText, Image, Palette } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { Footer, Header } from "@/components/layout"
 import { UrlInput } from "@/components/forms/UrlInput"
 import { StyleSettingsForm } from "@/components/StyleSettingsForm"
@@ -12,17 +13,29 @@ import { SettingsDialog } from "@/components/SettingsDialog"
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TourGuidePage } from "@/pages/tour-guide/tour-guide-page"
+import { DynamicQRPage } from "@/pages/dynamic-qr/dynamic-qr-page"
 
 const QRGeneratorApp: React.FC = () => {
   const [isTourGuideOpen, setIsTourGuideOpen] = useState(false)
+  const [isDynamicQROpen, setIsDynamicQROpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   const handleOpenTourGuide = useCallback(() => {
     setIsTourGuideOpen(true)
+    setIsDynamicQROpen(false)
   }, [])
 
   const handleCloseTourGuide = useCallback(() => {
     setIsTourGuideOpen(false)
+  }, [])
+
+  const handleOpenDynamicQR = useCallback(() => {
+    setIsDynamicQROpen(true)
+    setIsTourGuideOpen(false)
+  }, [])
+
+  const handleCloseDynamicQR = useCallback(() => {
+    setIsDynamicQROpen(false)
   }, [])
 
   return (
@@ -33,6 +46,15 @@ const QRGeneratorApp: React.FC = () => {
           isTourGuideOpen={isTourGuideOpen}
           onOpenTourGuide={handleOpenTourGuide}
           onCloseTourGuide={handleCloseTourGuide}
+          extraActions={
+            <Button
+              variant={isDynamicQROpen ? "secondary" : "ghost"}
+              size="sm"
+              onClick={isDynamicQROpen ? handleCloseDynamicQR : handleOpenDynamicQR}
+            >
+              {isDynamicQROpen ? "ツールに戻る" : "時限QR"}
+            </Button>
+          }
         />
       </div>
 
@@ -41,6 +63,10 @@ const QRGeneratorApp: React.FC = () => {
         {isTourGuideOpen ? (
           <div className="h-full overflow-auto mx-auto w-full max-w-none px-2 sm:px-4 lg:px-6 xl:px-8">
             <TourGuidePage onClose={handleCloseTourGuide} />
+          </div>
+        ) : isDynamicQROpen ? (
+          <div className="h-full overflow-auto mx-auto w-full max-w-none px-2 sm:px-4 lg:px-6 xl:px-8">
+            <DynamicQRPage onClose={handleCloseDynamicQR} />
           </div>
         ) : (
           <>

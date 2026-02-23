@@ -1,0 +1,16 @@
+name = "qr-dynamic-worker"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# KV namespaces
+# After creating with `wrangler kv namespace create LINKS_KV`, paste the IDs here.
+[[kv_namespaces]]
+binding = "LINKS_KV"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+[[kv_namespaces]]
+binding = "STATS_KV"
+id = "REPLACE_WITH_YOUR_STATS_KV_NAMESPACE_ID"
+
+# Secrets (set via `wrangler secret put ADMIN_TOKEN`)
+# ADMIN_TOKEN
