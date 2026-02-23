@@ -2,12 +2,17 @@ import React, { useState } from 'react';
 import { useQRStore } from '../../store/qrStore';
 import { generateQRCode, generateQRSVG } from '../../utils/qrGenerator';
 import { Button } from '../ui/button';
-import { Download, Copy, CheckCircle2 } from 'lucide-react';
+import { Download, Copy, Share2, CheckCircle2 } from 'lucide-react';
 
 export const DownloadButton: React.FC = () => {
   const qrStore = useQRStore();
   const [isDownloading, setIsDownloading] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+
+  const getTimestamp = () => {
+    const iso = new Date().toISOString().slice(0, 19);
+    return iso.replaceAll('-', '').replaceAll(':', '').replace('T', '');
+  };
 
   const handleDownload = async (format: 'png' | 'jpg' = 'png') => {
     if (!qrStore.url.trim()) {
@@ -17,7 +22,6 @@ export const DownloadButton: React.FC = () => {
 
     setIsDownloading(true);
     try {
-      // 非表示のキャンバスでQRコードを生成
       const canvas = document.createElement('canvas');
       const settings = qrStore.getQRSettings();
 
@@ -31,11 +35,8 @@ export const DownloadButton: React.FC = () => {
         canvas
       );
 
-      // ダウンロード
       const link = document.createElement('a');
-      const iso = new Date().toISOString().slice(0, 19);
-      const timestamp = iso.replaceAll('-', '').replaceAll(':', '').replace('T', '');
-      link.download = `qrcode_${timestamp}.${format}`;
+      link.download = `qr_${getTimestamp()}.${format}`;
 
       if (format === 'jpg') {
         link.href = canvas.toDataURL('image/jpeg', 0.95);
@@ -62,7 +63,6 @@ export const DownloadButton: React.FC = () => {
 
     setCopySuccess(false);
     try {
-      // 非表示のキャンバスでQRコードを生成
       const canvas = document.createElement('canvas');
       const settings = qrStore.getQRSettings();
 
@@ -76,7 +76,6 @@ export const DownloadButton: React.FC = () => {
         canvas
       );
 
-      // クリップボードに画像をコピー
       canvas.toBlob(async (blob) => {
         if (!blob) {
           alert('画像の生成に失敗しました');
@@ -88,7 +87,7 @@ export const DownloadButton: React.FC = () => {
             new ClipboardItem({ 'image/png': blob }),
           ]);
           setCopySuccess(true);
-          setTimeout(() => setCopySuccess(false), 2000); // 2秒後にリセット
+          setTimeout(() => setCopySuccess(false), 2000);
         } catch (error) {
           console.error('Clipboard copy failed:', error);
           alert('クリップボードへのコピーに失敗しました');
@@ -114,9 +113,7 @@ export const DownloadButton: React.FC = () => {
       const url = URL.createObjectURL(blob);
 
       const link = document.createElement('a');
-      const iso = new Date().toISOString().slice(0, 19);
-      const timestamp = iso.replaceAll('-', '').replaceAll(':', '').replace('T', '');
-      link.download = `qrcode_${timestamp}.svg`;
+      link.download = `qr_${getTimestamp()}.svg`;
       link.href = url;
 
       document.body.appendChild(link);
@@ -131,7 +128,39 @@ export const DownloadButton: React.FC = () => {
     }
   };
 
+  const handleShare = async () => {
+    if (!qrStore.url.trim()) return;
+
+    try {
+      const canvas = document.createElement('canvas');
+      const settings = qrStore.getQRSettings();
+      await generateQRCode(
+        qrStore.url,
+        { ...settings, logoFile: qrStore.logoFile, logoSettings: qrStore.logoSettings },
+        canvas
+      );
+
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, 'image/png')
+      );
+
+      if (blob && navigator.share) {
+        const file = new File([blob], `qr_${getTimestamp()}.png`, { type: 'image/png' });
+        await navigator.share({
+          title: 'QRコード',
+          text: qrStore.url,
+          files: [file],
+        });
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name !== 'AbortError') {
+        console.error('Share failed:', error);
+      }
+    }
+  };
+
   const isDisabled = !qrStore.url.trim();
+  const supportsShare = typeof navigator !== 'undefined' && !!navigator.share;
 
   return (
     <div className="space-y-4">
@@ -140,22 +169,22 @@ export const DownloadButton: React.FC = () => {
         <Button
           onClick={() => handleDownload('png')}
           disabled={isDisabled || isDownloading}
-          className="w-full"
+          className="w-full min-h-[44px]"
           size="default"
         >
           <Download className="w-4 h-4 mr-2" />
-          {isDownloading ? '生成中...' : 'PNG形式'}
+          {isDownloading ? '生成中...' : 'PNG保存'}
         </Button>
 
         <Button
           onClick={() => handleDownload('jpg')}
           disabled={isDisabled || isDownloading}
           variant="outline"
-          className="w-full"
+          className="w-full min-h-[44px]"
           size="default"
         >
           <Download className="w-4 h-4 mr-2" />
-          {isDownloading ? '生成中...' : 'JPG形式'}
+          {isDownloading ? '生成中...' : 'JPG保存'}
         </Button>
       </div>
 
@@ -164,33 +193,50 @@ export const DownloadButton: React.FC = () => {
         onClick={handleDownloadSVG}
         disabled={isDisabled || isDownloading}
         variant="outline"
-        className="w-full"
+        className="w-full min-h-[44px]"
         size="default"
       >
         <Download className="w-4 h-4 mr-2" />
-        {isDownloading ? '生成中...' : 'SVG形式（印刷・拡大対応）'}
+        {isDownloading ? '生成中...' : 'SVG保存（印刷・拡大対応）'}
       </Button>
 
-      {/* クリップボードコピー */}
-      <Button
-        onClick={handleCopyToClipboard}
-        disabled={isDisabled || isDownloading}
-        variant="secondary"
-        className="w-full"
-        size="default"
-      >
-        {copySuccess ? (
-          <>
-            <CheckCircle2 className="w-4 h-4 mr-2 text-green-600" />
-            コピー完了！
-          </>
-        ) : (
-          <>
-            <Copy className="w-4 h-4 mr-2" />
-            クリップボードにコピー
-          </>
+      {/* アクションボタン群 */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* クリップボードコピー */}
+        <Button
+          onClick={handleCopyToClipboard}
+          disabled={isDisabled || isDownloading}
+          variant="secondary"
+          className="w-full min-h-[44px]"
+          size="default"
+        >
+          {copySuccess ? (
+            <>
+              <CheckCircle2 className="w-4 h-4 mr-2 text-green-600" />
+              コピー完了！
+            </>
+          ) : (
+            <>
+              <Copy className="w-4 h-4 mr-2" />
+              画像をコピー
+            </>
+          )}
+        </Button>
+
+        {/* 共有ボタン（Web Share API） */}
+        {supportsShare && (
+          <Button
+            onClick={handleShare}
+            disabled={isDisabled}
+            variant="secondary"
+            className="w-full min-h-[44px]"
+            size="default"
+          >
+            <Share2 className="w-4 h-4 mr-2" />
+            共有する
+          </Button>
         )}
-      </Button>
+      </div>
 
       {/* 出力情報カード */}
       <div className="bg-gradient-to-r from-gray-50 to-blue-50 border border-gray-200 rounded-xl p-3">
