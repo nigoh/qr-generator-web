@@ -1,25 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQRStore } from '../../store/qrStore';
 import { Input, Label, Button, Tabs, TabsContent, TabsList, TabsTrigger } from '../ui';
 import { VCardForm } from '../../features/vcard/components/VCardForm';
-import { Link, Contact } from 'lucide-react';
+import { Link, Contact, MapPin, MessageSquare, Calendar } from 'lucide-react';
 
 export const UrlInput: React.FC = () => {
   const { url, setUrl } = useQRStore();
+  const [activeTab, setActiveTab] = useState('url');
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUrl(e.target.value);
   };
 
+  // 入力がURL形式かどうかを判定
+  const looksLikeUrl = /^https?:\/\//i.test(url.trim());
+
   return (
     <div className="space-y-4" data-tour="url-input">
-      <Tabs defaultValue="url" className="w-full">
+      <Tabs defaultValue="url" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-4">
-          <TabsTrigger value="url" className="flex items-center gap-1.5">
+          <TabsTrigger value="url" className="flex items-center gap-1.5 min-h-[44px]">
             <Link className="h-4 w-4" />
             URL / テキスト
           </TabsTrigger>
-          <TabsTrigger value="vcard" className="flex items-center gap-1.5">
+          <TabsTrigger value="vcard" className="flex items-center gap-1.5 min-h-[44px]">
             <Contact className="h-4 w-4" />
             名刺（vCard）
           </TabsTrigger>
@@ -35,56 +39,110 @@ export const UrlInput: React.FC = () => {
             <Input
               id="url-input"
               type="text"
+              inputMode={looksLikeUrl || !url ? 'url' : 'text'}
+              autoComplete="url"
               value={url}
               onChange={handleUrlChange}
               placeholder="https://example.com または 任意のテキスト"
-              className="w-full"
+              className="w-full text-base"
               required
+              aria-describedby="url-input-help"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            {!url.trim() && (
+              <p className="text-xs text-amber-600 mt-1" role="alert">
+                テキストを入力するとQRコードが自動生成されます
+              </p>
+            )}
+            <p id="url-input-help" className="text-xs text-gray-500 mt-1">
               WebサイトのURL、SNSアカウント、連絡先情報、Wi-Fi設定など、任意のテキストをQRコードに変換できます
             </p>
           </div>
 
-          {/* サンプルボタン */}
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setUrl('https://www.google.com')}
-            >
-              Google
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setUrl('mailto:info@example.com')}
-            >
-              メールアドレス
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setUrl('tel:+81-90-1234-5678')}
-            >
-              電話番号
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setUrl('WIFI:T:WPA;S:MyNetwork;P:password123;H:false;;')
-              }
-            >
-              Wi-Fi設定
-            </Button>
+          {/* 用途プリセットボタン */}
+          <div>
+            <Label className="text-xs text-gray-600 mb-1.5 block">用途プリセット</Label>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="min-h-[44px] sm:min-h-0"
+                onClick={() => setUrl('https://www.google.com')}
+              >
+                <Link className="h-3.5 w-3.5 mr-1" />
+                URL
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="min-h-[44px] sm:min-h-0"
+                onClick={() => setUrl('mailto:info@example.com')}
+              >
+                メール
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="min-h-[44px] sm:min-h-0"
+                onClick={() => setUrl('tel:+81-90-1234-5678')}
+              >
+                電話番号
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="min-h-[44px] sm:min-h-0"
+                onClick={() =>
+                  setUrl('WIFI:T:WPA;S:MyNetwork;P:password123;H:false;;')
+                }
+              >
+                Wi-Fi
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="min-h-[44px] sm:min-h-0"
+                onClick={() =>
+                  setUrl('smsto:+81901234567:こんにちは！')
+                }
+              >
+                <MessageSquare className="h-3.5 w-3.5 mr-1" />
+                SMS
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="min-h-[44px] sm:min-h-0"
+                onClick={() =>
+                  setUrl('geo:35.6812,139.7671?q=東京タワー')
+                }
+              >
+                <MapPin className="h-3.5 w-3.5 mr-1" />
+                地図
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="min-h-[44px] sm:min-h-0"
+                onClick={() =>
+                  setUrl(
+                    'BEGIN:VEVENT\nSUMMARY:会議\nDTSTART:20260301T100000\nDTEND:20260301T110000\nLOCATION:会議室A\nEND:VEVENT'
+                  )
+                }
+              >
+                <Calendar className="h-3.5 w-3.5 mr-1" />
+                イベント
+              </Button>
+            </div>
           </div>
 
-          {/* 文字数表示 */}
+          {/* 文字数表示・バリデーション */}
           {url && (
             <div className="text-xs text-gray-500 flex justify-between">
               <span>文字数: {url.length}</span>

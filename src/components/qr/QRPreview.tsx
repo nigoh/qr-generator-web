@@ -94,7 +94,7 @@ export const QRPreview: React.FC = () => {
                 QRコードを生成しましょう
               </h3>
               <p className="text-gray-500 text-sm">
-                右側の設定パネルでURL/テキストを入力してください
+                URL/テキストを入力してください
               </p>
             </div>
           </div>

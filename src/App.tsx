@@ -7,6 +7,7 @@ import { LogoSettingsForm } from "@/components/LogoSettingsForm"
 import { BasicSettingsForm } from "@/components/BasicSettingsForm"
 import { QRPreview } from "@/components/qr/QRPreview"
 import { DownloadButton } from "@/components/qr/DownloadButton"
+import { StickyActionBar } from "@/components/qr/StickyActionBar"
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TourGuidePage } from "@/pages/tour-guide/tour-guide-page"
@@ -34,7 +35,8 @@ const QRGeneratorApp: React.FC = () => {
       </div>
 
       {/* メインコンテンツ: ヘッダーとフッターの間 */}
-      <div className="pt-16 pb-20">
+      {/* モバイルではStickyActionBar分の余白(pb-28)、デスクトップではフッター分(pb-20) */}
+      <div className="pt-16 pb-28 xl:pb-20">
         {isTourGuideOpen ? (
           <div className="mx-auto w-full max-w-none px-2 sm:px-4 lg:px-6 xl:px-8">
             <TourGuidePage onClose={handleCloseTourGuide} />
@@ -42,7 +44,10 @@ const QRGeneratorApp: React.FC = () => {
         ) : (
           <div className="mx-auto w-full max-w-none px-2 sm:px-4 lg:px-6 xl:px-8">
             <div className="min-h-[calc(100vh-144px)] flex flex-col gap-4 py-4 lg:gap-6 xl:flex-row">
-              {/* 左側: 設定項目（スクロール可能） */}
+              {/* モバイル: 入力 → プレビュー → 詳細設定 の1カラム */}
+              {/* デスクトップ: 左（設定）右（プレビュー）の2カラム */}
+
+              {/* 入力エリア（モバイルで最初に表示） */}
               <div className="order-1 w-full xl:order-1 xl:w-3/5">
                 <Card className="flex min-h-full flex-col border shadow-sm">
                   <CardHeader className="pb-4">
@@ -95,7 +100,7 @@ const QRGeneratorApp: React.FC = () => {
                 </Card>
               </div>
 
-              {/* 右側: QRプレビューエリア */}
+              {/* プレビューエリア（モバイルでは入力の直後に表示） */}
               <div className="order-2 w-full xl:order-2 xl:w-2/5">
                 <div className="sticky top-20">
                   <Card className="border-2 shadow-lg">
@@ -120,12 +125,13 @@ const QRGeneratorApp: React.FC = () => {
         )}
       </div>
 
-      {/* 固定フッター */}
-      <div className="fixed bottom-0 left-0 right-0 z-50">
+      {/* モバイル用: 固定アクションバー（コピー/共有/保存） */}
+      <StickyActionBar />
+
+      {/* 固定フッター（デスクトップのみ表示） */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 hidden xl:block">
         <Footer />
       </div>
-
-      {/* ツアーガイドビューはヘッダーのトグルで切り替え */}
     </div>
   );
 };
