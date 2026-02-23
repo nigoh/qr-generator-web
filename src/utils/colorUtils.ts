@@ -1,6 +1,10 @@
 /**
  * 色変換ユーティリティ関数
  */
+const DEFAULT_QR_FOREGROUND = '#111827';
+const DEFAULT_QR_BACKGROUND = '#F9FAFB';
+const CONTRAST_LIGHT_BACKGROUND = '#FFFFFF';
+const CONTRAST_DARK_BACKGROUND = '#111827';
 
 /**
  * RGB値を16進数文字列に変換
@@ -87,11 +91,11 @@ export const hasGoodContrast = (
  * 前景色に対して読み取りやすい背景色を選択
  */
 export const selectReadableBackground = (foreground: string): string => {
-  const lightBg = '#FFFFFF';
-  const darkBg = '#111827';
-  return getContrastRatio(foreground, lightBg) >= getContrastRatio(foreground, darkBg)
-    ? lightBg
-    : darkBg;
+  const lightContrast = getContrastRatio(foreground, CONTRAST_LIGHT_BACKGROUND);
+  const darkContrast = getContrastRatio(foreground, CONTRAST_DARK_BACKGROUND);
+  return lightContrast >= darkContrast
+    ? CONTRAST_LIGHT_BACKGROUND
+    : CONTRAST_DARK_BACKGROUND;
 };
 
 /**
@@ -138,7 +142,7 @@ export const extractQRColorsFromImage = async (
       }
 
       if (count === 0) {
-        resolve({ fgColor: '#111827', bgColor: '#F9FAFB' });
+        resolve({ fgColor: DEFAULT_QR_FOREGROUND, bgColor: DEFAULT_QR_BACKGROUND });
         return;
       }
 

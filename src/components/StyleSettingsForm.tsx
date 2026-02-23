@@ -11,6 +11,7 @@ const DOT_STYLE_OPTIONS = [
   { value: 'rounded', label: '角丸四角形' },
   { value: 'diamond', label: 'ダイヤモンド' },
 ];
+const COLOR_PRESETS = getQRColorPresets();
 
 export const StyleSettingsForm: React.FC = () => {
   const {
@@ -21,7 +22,6 @@ export const StyleSettingsForm: React.FC = () => {
     setBgColor,
     setDotStyle,
   } = useQRStore();
-  const presets = getQRColorPresets();
   const contrast = getContrastRatio(fgColor, bgColor);
 
   return (
@@ -71,7 +71,7 @@ export const StyleSettingsForm: React.FC = () => {
       <div className="space-y-2">
         <Label>カラープリセット</Label>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-          {presets.map((preset) => (
+          {COLOR_PRESETS.map((preset) => (
             <Button
               key={preset.name}
               variant="outline"

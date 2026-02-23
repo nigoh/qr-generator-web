@@ -18,6 +18,7 @@ export const LogoSettingsForm: React.FC = () => {
   
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isApplyingImageColors, setIsApplyingImageColors] = useState(false);
+  const [imageColorError, setImageColorError] = useState<string | null>(null);
 
   // ロゴファイルが変更されたときの処理
   const handleLogoUpload = (file: File | null) => {
@@ -36,6 +37,7 @@ export const LogoSettingsForm: React.FC = () => {
 
   const handleApplyImageColors = async () => {
     if (!logoFile) return;
+    setImageColorError(null);
     setIsApplyingImageColors(true);
     try {
       const { fgColor, bgColor } = await extractQRColorsFromImage(logoFile);
@@ -43,7 +45,7 @@ export const LogoSettingsForm: React.FC = () => {
       setBgColor(bgColor);
     } catch (error) {
       console.error('Failed to extract colors from logo image:', error);
-      alert('画像から色を抽出できませんでした');
+      setImageColorError('画像から色を抽出できませんでした。別の画像でお試しください。');
     } finally {
       setIsApplyingImageColors(false);
     }
@@ -196,6 +198,9 @@ export const LogoSettingsForm: React.FC = () => {
             <p className="text-xs text-gray-500">
               ロゴの平均色をドット色に使い、読み取りやすい背景色を自動選択します。
             </p>
+            {imageColorError && (
+              <p className="text-xs text-red-600">{imageColorError}</p>
+            )}
           </div>
 
           {/* 注意事項 */}
