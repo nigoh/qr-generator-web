@@ -1,13 +1,15 @@
 import React from 'react';
 import { useQRStore } from '../store/qrStore';
 import { ColorPicker } from './ui/ColorPicker';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui';
+import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui';
 import { Label } from './ui';
+import { getContrastRatio, getQRColorPresets } from '../utils/colorUtils';
 
 const DOT_STYLE_OPTIONS = [
   { value: 'square', label: '四角形（標準）' },
   { value: 'circle', label: '円形' },
   { value: 'rounded', label: '角丸四角形' },
+  { value: 'diamond', label: 'ダイヤモンド' },
 ];
 
 export const StyleSettingsForm: React.FC = () => {
@@ -19,6 +21,8 @@ export const StyleSettingsForm: React.FC = () => {
     setBgColor,
     setDotStyle,
   } = useQRStore();
+  const presets = getQRColorPresets();
+  const contrast = getContrastRatio(fgColor, bgColor);
 
   return (
     <div className="space-y-6">
@@ -44,7 +48,7 @@ export const StyleSettingsForm: React.FC = () => {
         <Label htmlFor="dot-style">ドットの形状</Label>
         <Select
           value={dotStyle}
-          onValueChange={(value) => setDotStyle(value as 'square' | 'circle' | 'rounded')}
+          onValueChange={(value) => setDotStyle(value as 'square' | 'circle' | 'rounded' | 'diamond')}
         >
           <SelectTrigger>
             <SelectValue placeholder="ドットの形状を選択" />
@@ -63,6 +67,25 @@ export const StyleSettingsForm: React.FC = () => {
         ドットの形状を変更すると、QRコードの見た目が変わります。
         読み取り精度を重視する場合は「四角形（標準）」を推奨します。
       </p>
+
+      <div className="space-y-2">
+        <Label>カラープリセット</Label>
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+          {presets.map((preset) => (
+            <Button
+              key={preset.name}
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setFgColor(preset.fg);
+                setBgColor(preset.bg);
+              }}
+            >
+              {preset.name}
+            </Button>
+          ))}
+        </div>
+      </div>
 
       {/* カラープレビュー */}
       <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
@@ -84,11 +107,11 @@ export const StyleSettingsForm: React.FC = () => {
           </div>
           <div className="flex-1" />
           <div className="text-xs text-gray-500">
-            コントラスト比: {calculateContrast(fgColor, bgColor).toFixed(2)}:1
+            コントラスト比: {contrast.toFixed(2)}:1
           </div>
         </div>
         
-        {calculateContrast(fgColor, bgColor) < 3 && (
+        {contrast < 3 && (
           <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-700">
             ⚠️ コントラスト比が低いため、QRコードが読み取りにくい可能性があります。
           </div>
@@ -97,24 +120,3 @@ export const StyleSettingsForm: React.FC = () => {
     </div>
   );
 };
-
-// コントラスト比計算関数
-function calculateContrast(color1: string, color2: string): number {
-  const getLuminance = (color: string): number => {
-    const hex = color.replace('#', '');
-    const r = parseInt(hex.substr(0, 2), 16) / 255;
-    const g = parseInt(hex.substr(2, 2), 16) / 255;
-    const b = parseInt(hex.substr(4, 2), 16) / 255;
-    
-    const getRGB = (c: number) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-    
-    return 0.2126 * getRGB(r) + 0.7152 * getRGB(g) + 0.0722 * getRGB(b);
-  };
-  
-  const lum1 = getLuminance(color1);
-  const lum2 = getLuminance(color2);
-  const brightest = Math.max(lum1, lum2);
-  const darkest = Math.min(lum1, lum2);
-  
-  return (brightest + 0.05) / (darkest + 0.05);
-}

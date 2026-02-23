@@ -3,7 +3,7 @@ export interface QRSettings {
   errorCorrection: 'L' | 'M' | 'Q' | 'H';
   fgColor: string;
   bgColor: string;
-  dotStyle: 'square' | 'circle' | 'rounded';
+  dotStyle: 'square' | 'circle' | 'rounded' | 'diamond';
   boxSize: number;
   border: number;
 }
