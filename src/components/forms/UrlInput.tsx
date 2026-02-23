@@ -4,7 +4,11 @@ import { Input, Label, Button, Tabs, TabsContent, TabsList, TabsTrigger } from '
 import { VCardForm } from '../../features/vcard/components/VCardForm';
 import { Link, Contact, MapPin, MessageSquare, Calendar, Mail, Phone, Wifi } from 'lucide-react';
 
-export const UrlInput: React.FC = () => {
+interface UrlInputProps {
+  compact?: boolean;
+}
+
+export const UrlInput: React.FC<UrlInputProps> = ({ compact = false }) => {
   const { url, setUrl } = useQRStore();
   const [activeTab, setActiveTab] = useState('url');
 
@@ -15,6 +19,27 @@ export const UrlInput: React.FC = () => {
   // 入力がURL形式かどうかを判定
   const looksLikeUrl = /^https?:\/\//i.test(url.trim());
 
+  // コンパクトモード: モバイルメイン画面用（入力フィールドのみ）
+  if (compact) {
+    return (
+      <div data-tour="url-input">
+        <Input
+          id="url-input"
+          type="text"
+          inputMode={looksLikeUrl || !url ? 'url' : 'text'}
+          autoComplete="url"
+          value={url}
+          onChange={handleUrlChange}
+          placeholder="URLまたはテキストを入力"
+          className="w-full text-base"
+          required
+          aria-label="URL または テキスト"
+        />
+      </div>
+    );
+  }
+
+  // フルモード: デスクトップおよび設定ダイアログ用
   return (
     <div className="space-y-4" data-tour="url-input">
       <Tabs defaultValue="url" value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -32,12 +57,12 @@ export const UrlInput: React.FC = () => {
         {/* URL / テキスト タブ */}
         <TabsContent value="url" className="mt-0 space-y-4">
           <div>
-            <Label htmlFor="url-input">
+            <Label htmlFor="url-input-full">
               URL または テキスト
               <span className="text-red-500 ml-1">*</span>
             </Label>
             <Input
-              id="url-input"
+              id="url-input-full"
               type="text"
               inputMode={looksLikeUrl || !url ? 'url' : 'text'}
               autoComplete="url"

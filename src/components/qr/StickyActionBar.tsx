@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { useQRStore } from '../../store/qrStore';
 import { generateQRCode } from '../../utils/qrGenerator';
-import { Download, Copy, Share2, CheckCircle2 } from 'lucide-react';
+import { Download, Copy, Share2, CheckCircle2, Settings } from 'lucide-react';
 import { Button } from '../ui/button';
 
-export const StickyActionBar: React.FC = () => {
+interface StickyActionBarProps {
+  onOpenSettings?: () => void;
+}
+
+export const StickyActionBar: React.FC<StickyActionBarProps> = ({ onOpenSettings }) => {
   const qrStore = useQRStore();
   const [copySuccess, setCopySuccess] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -110,8 +114,18 @@ export const StickyActionBar: React.FC = () => {
   const supportsShare = typeof navigator !== 'undefined' && !!navigator.share;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white/95 backdrop-blur-sm shadow-[0_-2px_10px_rgba(0,0,0,0.1)] xl:hidden">
+    <div className="shrink-0 border-t border-gray-200 bg-white/95 backdrop-blur-sm shadow-[0_-2px_10px_rgba(0,0,0,0.1)] xl:hidden">
       <div className="flex items-center justify-center gap-2 px-3 py-2.5 max-w-lg mx-auto">
+        <Button
+          onClick={onOpenSettings}
+          variant="outline"
+          size="default"
+          className="min-h-[44px] px-3"
+          aria-label="設定を開く"
+        >
+          <Settings className="w-5 h-5" />
+        </Button>
+
         <Button
           onClick={handleDownloadPNG}
           disabled={isDisabled || isDownloading}
@@ -119,7 +133,7 @@ export const StickyActionBar: React.FC = () => {
           className="flex-1 min-h-[44px] text-sm"
         >
           <Download className="w-4 h-4 mr-1.5" />
-          {isDownloading ? '保存中...' : '保存(PNG)'}
+          {isDownloading ? '保存中...' : '保存'}
         </Button>
 
         <Button
