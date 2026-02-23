@@ -79,12 +79,10 @@ describe("useTourGuide", () => {
   it("replays from the beginning", () => {
     const { result } = renderHook(() => useTourGuide(tourSteps))
 
-    act(() => {
-      result.current.start()
-      result.current.next()
-      result.current.next()
-      result.current.next()
-    })
+    act(() => { result.current.start() })
+    act(() => { result.current.next() })
+    act(() => { result.current.next() })
+    act(() => { result.current.next() })
 
     expect(result.current.hasCompleted).toBeTruthy()
 

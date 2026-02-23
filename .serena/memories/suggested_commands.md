@@ -11,6 +11,15 @@ npm run build
 # リンター実行
 npm run lint
 
+# 型チェック（エラーのみ確認、ファイル出力なし）
+npm run type-check
+
+# テスト実行（watchモード）
+npm run test
+
+# テスト実行（1回のみ）
+npm run test -- --run
+
 # ビルド結果のプレビュー
 npm run preview
 ```
@@ -24,37 +33,20 @@ npm install
 npm run dev
 ```
 
-## Windows 固有のコマンド
-```powershell
-# プロジェクト構造確認
-dir /s
-Get-ChildItem -Recurse
-
-# ファイル検索
-findstr /r /i "pattern" *.tsx *.ts
-
-# Git操作
-git status
-git add .
-git commit -m "message"
-git push
-```
-
 ## タスク完了時の推奨アクション
 1. **リンターチェック**: `npm run lint`
-2. **型チェック**: TypeScriptコンパイラが自動実行
-3. **ビルドテスト**: `npm run build` でエラーがないことを確認
-4. **動作確認**: ブラウザで機能テスト
-5. **Git操作**: コミット・プッシュ
+2. **型チェック**: `npm run type-check`
+3. **テスト実行**: `npm run test -- --run`
+4. **ビルドテスト**: `npm run build` でエラーがないことを確認
+5. **動作確認**: ブラウザで機能テスト
 
-## よく使うファイル操作
-```bash
-# ファイル作成
-echo. > newfile.tsx
+## テストファイルの配置
+- テストファイルはテスト対象のファイルと同じディレクトリに配置
+- 命名規則: `<filename>.test.ts` or `<filename>.test.tsx`
+- 例: `src/features/tour-guide/hooks/use-tour-guide.test.ts`
+- テストフレームワーク: Vitest + Testing Library
+- テスト環境設定: `src/test/test-setup.ts`
 
-# ディレクトリ作成
-mkdir new-folder
-
-# ファイルコピー
-copy source.tsx destination.tsx
-```
+## パスエイリアス
+- `@/` → `./src/` （`tsconfig.app.json` で設定済み）
+- 例: `import { cn } from "@/lib/utils"`
