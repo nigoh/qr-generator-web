@@ -4,6 +4,7 @@ import { FileUpload } from './ui/FileUpload';
 import { Slider } from './ui';
 import { Label } from './ui';
 import { Button } from './ui';
+import { extractQRColorsFromImage } from '../utils/colorUtils';
 
 export const LogoSettingsForm: React.FC = () => {
   const {
@@ -11,9 +12,12 @@ export const LogoSettingsForm: React.FC = () => {
     logoSettings,
     setLogoFile,
     updateLogoSettings,
+    setFgColor,
+    setBgColor,
   } = useQRStore();
   
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [isApplyingImageColors, setIsApplyingImageColors] = useState(false);
 
   // ロゴファイルが変更されたときの処理
   const handleLogoUpload = (file: File | null) => {
@@ -27,6 +31,21 @@ export const LogoSettingsForm: React.FC = () => {
       reader.readAsDataURL(file);
     } else {
       setLogoPreview(null);
+    }
+  };
+
+  const handleApplyImageColors = async () => {
+    if (!logoFile) return;
+    setIsApplyingImageColors(true);
+    try {
+      const { fgColor, bgColor } = await extractQRColorsFromImage(logoFile);
+      setFgColor(fgColor);
+      setBgColor(bgColor);
+    } catch (error) {
+      console.error('Failed to extract colors from logo image:', error);
+      alert('画像から色を抽出できませんでした');
+    } finally {
+      setIsApplyingImageColors(false);
     }
   };
 
@@ -161,6 +180,22 @@ export const LogoSettingsForm: React.FC = () => {
                 小さめ
               </Button>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>画像に合わせた配色</Label>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleApplyImageColors}
+              disabled={isApplyingImageColors}
+              className="w-full"
+            >
+              {isApplyingImageColors ? '配色を抽出中...' : 'ロゴ画像に合わせてQR配色を適用'}
+            </Button>
+            <p className="text-xs text-gray-500">
+              ロゴの平均色をドット色に使い、読み取りやすい背景色を自動選択します。
+            </p>
           </div>
 
           {/* 注意事項 */}

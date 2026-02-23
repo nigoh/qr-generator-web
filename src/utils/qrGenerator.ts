@@ -119,11 +119,19 @@ export const generateQRCode = async (
               );
               ctx.fill();
               break;
-            case 'rounded':
+            case 'rounded': {
               const radius = boxSize * 0.2;
               ctx.beginPath();
               ctx.roundRect(x, y, boxSize, boxSize, radius);
               ctx.fill();
+              break;
+            }
+            case 'diamond':
+              ctx.save();
+              ctx.translate(x + boxSize / 2, y + boxSize / 2);
+              ctx.rotate(Math.PI / 4);
+              ctx.fillRect(-boxSize * 0.35, -boxSize * 0.35, boxSize * 0.7, boxSize * 0.7);
+              ctx.restore();
               break;
             default: // square
               ctx.fillRect(x, y, boxSize, boxSize);
@@ -135,7 +143,13 @@ export const generateQRCode = async (
 
     // ロゴを描画
     if (options.logoFile && options.logoSettings) {
-      await drawLogo(ctx, options.logoFile, options.logoSettings, totalSize);
+      await drawLogo(
+        ctx,
+        options.logoFile,
+        options.logoSettings,
+        totalSize,
+        options.bgColor
+      );
     }
 
     return canvas;
@@ -152,7 +166,8 @@ const drawLogo = async (
   ctx: CanvasRenderingContext2D,
   logoFile: File,
   logoSettings: LogoSettings,
-  canvasSize: number
+  canvasSize: number,
+  baseBackgroundColor: string
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -170,8 +185,8 @@ const drawLogo = async (
 
         ctx.save();
 
-        // 背景を白で塗りつぶし
-        ctx.fillStyle = '#ffffff';
+        // 背景色に合わせたパディング
+        ctx.fillStyle = baseBackgroundColor;
         if (logoSettings.radius > 0) {
           const radius = (bgSize * logoSettings.radius) / 100;
           ctx.beginPath();

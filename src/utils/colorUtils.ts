@@ -84,6 +84,80 @@ export const hasGoodContrast = (
 };
 
 /**
+ * 前景色に対して読み取りやすい背景色を選択
+ */
+export const selectReadableBackground = (foreground: string): string => {
+  const lightBg = '#FFFFFF';
+  const darkBg = '#111827';
+  return getContrastRatio(foreground, lightBg) >= getContrastRatio(foreground, darkBg)
+    ? lightBg
+    : darkBg;
+};
+
+/**
+ * 画像からQRコード用の配色を抽出
+ */
+export const extractQRColorsFromImage = async (
+  file: File
+): Promise<{ fgColor: string; bgColor: string }> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    const image = new Image();
+
+    reader.onload = () => {
+      image.src = reader.result as string;
+    };
+    reader.onerror = () => reject(new Error('画像ファイルの読み込みに失敗しました'));
+
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('画像解析に失敗しました'));
+        return;
+      }
+
+      const sampleSize = 32;
+      canvas.width = sampleSize;
+      canvas.height = sampleSize;
+      ctx.drawImage(image, 0, 0, sampleSize, sampleSize);
+      const { data } = ctx.getImageData(0, 0, sampleSize, sampleSize);
+
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      let count = 0;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const alpha = data[i + 3];
+        if (alpha < 32) continue;
+        r += data[i];
+        g += data[i + 1];
+        b += data[i + 2];
+        count += 1;
+      }
+
+      if (count === 0) {
+        resolve({ fgColor: '#111827', bgColor: '#F9FAFB' });
+        return;
+      }
+
+      const fgColor = rgbToHex([
+        Math.round(r / count),
+        Math.round(g / count),
+        Math.round(b / count),
+      ]).toUpperCase();
+      const bgColor = selectReadableBackground(fgColor);
+
+      resolve({ fgColor, bgColor });
+    };
+
+    image.onerror = () => reject(new Error('画像の解析に失敗しました'));
+    reader.readAsDataURL(file);
+  });
+};
+
+/**
  * QRコード用の推奨カラーペア
  */
 export const getQRColorPresets = () => [
