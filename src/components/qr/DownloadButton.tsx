@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQRStore } from '../../store/qrStore';
-import { generateQRCode } from '../../utils/qrGenerator';
+import { generateQRCode, generateQRSVG } from '../../utils/qrGenerator';
 import { Button } from '../ui/button';
 import { Download, Copy, CheckCircle2 } from 'lucide-react';
 
@@ -100,6 +100,37 @@ export const DownloadButton: React.FC = () => {
     }
   };
 
+  const handleDownloadSVG = async () => {
+    if (!qrStore.url.trim()) {
+      alert('QRコードに埋め込むテキストを入力してください');
+      return;
+    }
+
+    setIsDownloading(true);
+    try {
+      const settings = qrStore.getQRSettings();
+      const svgContent = await generateQRSVG(qrStore.url, settings);
+      const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      const iso = new Date().toISOString().slice(0, 19);
+      const timestamp = iso.replaceAll('-', '').replaceAll(':', '').replace('T', '');
+      link.download = `qrcode_${timestamp}.svg`;
+      link.href = url;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('SVG download failed:', error);
+      alert('SVGのダウンロードに失敗しました');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const isDisabled = !qrStore.url.trim();
 
   return (
@@ -127,6 +158,18 @@ export const DownloadButton: React.FC = () => {
           {isDownloading ? '生成中...' : 'JPG形式'}
         </Button>
       </div>
+
+      {/* SVGダウンロード */}
+      <Button
+        onClick={handleDownloadSVG}
+        disabled={isDisabled || isDownloading}
+        variant="outline"
+        className="w-full"
+        size="default"
+      >
+        <Download className="w-4 h-4 mr-2" />
+        {isDownloading ? '生成中...' : 'SVG形式（印刷・拡大対応）'}
+      </Button>
 
       {/* クリップボードコピー */}
       <Button
@@ -167,14 +210,14 @@ export const DownloadButton: React.FC = () => {
             <span className="ml-1 text-gray-800 font-medium">小サイズ</span>
           </div>
           <div>
+            <span className="text-gray-600">SVG:</span>
+            <span className="ml-1 text-gray-800 font-medium">無限拡大</span>
+          </div>
+          <div>
             <span className="text-gray-600">解像度:</span>
             <span className="ml-1 text-gray-800 font-medium">
               {qrStore.boxSize * (25 + qrStore.border * 2)}px
             </span>
-          </div>
-          <div>
-            <span className="text-gray-600">用途:</span>
-            <span className="ml-1 text-gray-800 font-medium">印刷・Web</span>
           </div>
         </div>
       </div>
