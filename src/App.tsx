@@ -26,7 +26,7 @@ const QRGeneratorApp: React.FC = () => {
   }, [])
 
   return (
-    <div className="h-dvh flex flex-col overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 xl:min-h-screen xl:h-auto xl:overflow-auto">
+    <div className="h-screen h-dvh flex flex-col overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 xl:min-h-screen xl:h-auto xl:overflow-auto">
       {/* ヘッダー */}
       <div className="shrink-0 xl:fixed xl:top-0 xl:left-0 xl:right-0 xl:z-50">
         <Header
