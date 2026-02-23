@@ -117,6 +117,17 @@
 
 /* ツアー機能専用のスタイル */
 @layer utilities {
+  /* iOS Safari のアドレスバーを考慮した高さ（100vh→100dvh の上書きを1クラスで保証） */
+  .h-safe-screen {
+    height: 100vh; /* フォールバック（dvh 非対応ブラウザ） */
+    height: 100dvh; /* iOS Safari 15.4+ / Chrome 108+ で上書き */
+  }
+
+  /* iOS ホームインジケータ分の余白を pb に加算する */
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
+  }
+
   .tour-no-scroll {
     overflow: hidden !important;
     position: fixed !important;

@@ -36,7 +36,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="px-4 py-4 space-y-4 pb-24">
+        <div className="px-4 py-4 space-y-4 pb-[env(safe-area-inset-bottom,96px)]">
           <CollapsibleSection
             title={
               <div className="flex items-center gap-2">

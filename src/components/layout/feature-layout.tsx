@@ -49,7 +49,7 @@ export function FeatureLayout({
               ) : null}
             </header>
           ) : null}
-          <div className={cn("relative", className)}>{children}</div>
+          <div className={cn("flex flex-col gap-6", className)}>{children}</div>
         </div>
       </div>
     </div>

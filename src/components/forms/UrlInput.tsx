@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useQRStore } from '../../store/qrStore';
-import { Input, Label, Button, Tabs, TabsContent, TabsList, TabsTrigger } from '../ui';
+import { Input, Label, Tabs, TabsContent, TabsList, TabsTrigger } from '../ui';
 import { VCardForm } from '../../features/vcard/components/VCardForm';
-import { Link, Contact, MapPin, MessageSquare, Calendar, Mail, Phone, Wifi } from 'lucide-react';
+import { Link, Contact } from 'lucide-react';
 
 interface UrlInputProps {
   compact?: boolean;
@@ -83,104 +83,21 @@ export const UrlInput: React.FC<UrlInputProps> = ({ compact = false }) => {
             </p>
           </div>
 
-          {/* 用途プリセットボタン */}
-          <div>
-            <Label className="text-xs text-gray-600 mb-1.5 block">用途プリセット</Label>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="min-h-[44px] sm:min-h-0"
-                onClick={() => setUrl('https://www.google.com')}
-              >
-                <Link className="h-3.5 w-3.5 mr-1" />
-                URL
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="min-h-[44px] sm:min-h-0"
-                onClick={() => setUrl('mailto:info@example.com')}
-              >
-                <Mail className="h-3.5 w-3.5 mr-1" />
-                メール
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="min-h-[44px] sm:min-h-0"
-                onClick={() => setUrl('tel:+81-90-1234-5678')}
-              >
-                <Phone className="h-3.5 w-3.5 mr-1" />
-                電話番号
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="min-h-[44px] sm:min-h-0"
-                onClick={() =>
-                  setUrl('WIFI:T:WPA;S:MyNetwork;P:password123;H:false;;')
-                }
-              >
-                <Wifi className="h-3.5 w-3.5 mr-1" />
-                Wi-Fi
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="min-h-[44px] sm:min-h-0"
-                onClick={() =>
-                  setUrl('smsto:+81901234567:こんにちは！')
-                }
-              >
-                <MessageSquare className="h-3.5 w-3.5 mr-1" />
-                SMS
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="min-h-[44px] sm:min-h-0"
-                onClick={() =>
-                  setUrl('geo:35.6812,139.7671?q=東京タワー')
-                }
-              >
-                <MapPin className="h-3.5 w-3.5 mr-1" />
-                地図
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="min-h-[44px] sm:min-h-0"
-                onClick={() =>
-                  setUrl(
-                    'BEGIN:VEVENT\nSUMMARY:会議\nDTSTART:20260301T100000\nDTEND:20260301T110000\nLOCATION:会議室A\nEND:VEVENT'
-                  )
-                }
-              >
-                <Calendar className="h-3.5 w-3.5 mr-1" />
-                イベント
-              </Button>
-            </div>
-          </div>
-
           {/* 文字数表示・バリデーション */}
           {url && (
-            <div className="text-xs text-gray-500 flex justify-between">
+            <div className="text-xs text-gray-500 flex justify-between" aria-live="polite">
               <span>文字数: {url.length}</span>
-              <span
-                className={url.length > 2000 ? 'text-red-500' : 'text-green-600'}
-              >
-                {url.length > 2000
-                  ? '⚠️ 長すぎます（推奨: 2000文字以下）'
-                  : '✓ 適切な長さです'}
-              </span>
+              {url.length > 2000 ? (
+                <span className="text-red-500" role="status">
+                  <span aria-hidden="true">⚠️</span>{' '}
+                  長すぎます（推奨: 2000文字以下）
+                </span>
+              ) : (
+                <span className="text-green-600" role="status">
+                  <span aria-hidden="true">✓</span>{' '}
+                  適切な長さです
+                </span>
+              )}
             </div>
           )}
         </TabsContent>

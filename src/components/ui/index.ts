@@ -29,6 +29,28 @@ export {
 export { Slider } from "./slider"
 export { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./accordion"
 export { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs"
+export { Badge, badgeVariants } from "./badge"
+export { Toaster } from "./sonner"
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip"
+export { Avatar, AvatarFallback, AvatarImage } from "./avatar"
+export {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuGroup,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+} from "./dropdown-menu"
+export { Separator } from "./separator"
+export { Skeleton } from "./skeleton"
+export { Alert, AlertDescription, AlertTitle } from "./alert"
+export { ScrollArea, ScrollBar } from "./scroll-area"
+export { Switch } from "./switch"
 
 // === その他のUIコンポーネント ===
 export { CollapsibleSection } from "./CollapsibleSection"
