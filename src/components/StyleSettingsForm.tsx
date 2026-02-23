@@ -1,27 +1,18 @@
 import React from 'react';
 import { useQRStore } from '../store/qrStore';
 import { ColorPicker } from './ui/ColorPicker';
-import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui';
+import { Button } from './ui';
 import { Label } from './ui';
 import { getContrastRatio, getQRColorPresets } from '../utils/colorUtils';
-
-const DOT_STYLE_OPTIONS = [
-  { value: 'square', label: '四角形（標準）' },
-  { value: 'circle', label: '円形' },
-  { value: 'rounded', label: '角丸四角形' },
-  { value: 'diamond', label: 'ダイヤモンド' },
-];
 
 export const StyleSettingsForm: React.FC = () => {
   const {
     fgColor,
     bgColor,
     fgGradientEnd,
-    dotStyle,
     setFgColor,
     setBgColor,
     setFgGradientEnd,
-    setDotStyle,
   } = useQRStore();
   const presets = getQRColorPresets();
   const contrast = getContrastRatio(fgColor, bgColor);
@@ -100,31 +91,6 @@ export const StyleSettingsForm: React.FC = () => {
         )}
       </div>
 
-      {/* ドットスタイル */}
-      <div className="space-y-2">
-        <Label htmlFor="dot-style">ドットの形状</Label>
-        <Select
-          value={dotStyle}
-          onValueChange={(value) => setDotStyle(value as 'square' | 'circle' | 'rounded' | 'diamond')}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="ドットの形状を選択" />
-          </SelectTrigger>
-          <SelectContent>
-            {DOT_STYLE_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <p className="text-xs text-gray-500">
-        ドットの形状を変更すると、QRコードの見た目が変わります。
-        読み取り精度を重視する場合は「四角形（標準）」を推奨します。
-      </p>
-
       <div className="space-y-2">
         <Label>カラープリセット</Label>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
@@ -170,14 +136,24 @@ export const StyleSettingsForm: React.FC = () => {
             <span className="text-sm text-gray-600">背景</span>
           </div>
           <div className="flex-1" />
-          <div className="text-xs text-gray-500">
-            コントラスト比: {contrast.toFixed(2)}:1
+          <div className="text-xs text-gray-500 flex items-center gap-1.5">
+            <span>コントラスト比: <strong className={contrast >= 4.5 ? 'text-green-700' : contrast >= 3 ? 'text-yellow-700' : 'text-red-700'}>{contrast.toFixed(2)}:1</strong></span>
+            {contrast >= 4.5 ? (
+              <span className="text-green-700 font-medium">✓ WCAG AA</span>
+            ) : contrast >= 3 ? (
+              <span className="text-yellow-700 font-medium">△ AA不足</span>
+            ) : (
+              <span className="text-red-700 font-medium">✗ 不十分</span>
+            )}
           </div>
         </div>
         
-        {contrast < 3 && (
+        {contrast < 4.5 && (
           <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-700">
-            ⚠️ コントラスト比が低いため、QRコードが読み取りにくい可能性があります。
+            <span aria-hidden="true">⚠️</span>{' '}
+            {contrast < 3
+              ? 'コントラスト比が低すぎます。QRコードが読み取れない可能性があります。'
+              : 'WCAG AA基準（4.5:1）を下回っています。読み取りにくい場合があります。'}
           </div>
         )}
       </div>

@@ -57,6 +57,16 @@ export function VCardEditForm({ initial, isLoading, onSave, onCancel }: VCardEdi
             <Input id="vc-first" value={data.firstName} onChange={set("firstName")} placeholder="太郎" />
           </div>
         </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <Label htmlFor="vc-last-kana">姓（ふりがな）</Label>
+            <Input id="vc-last-kana" value={data.lastNameKana} onChange={set("lastNameKana")} placeholder="やまだ" />
+          </div>
+          <div>
+            <Label htmlFor="vc-first-kana">名（ふりがな）</Label>
+            <Input id="vc-first-kana" value={data.firstNameKana} onChange={set("firstNameKana")} placeholder="たろう" />
+          </div>
+        </div>
       </fieldset>
 
       <div className="grid grid-cols-2 gap-2">

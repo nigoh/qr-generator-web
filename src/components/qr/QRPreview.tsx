@@ -64,14 +64,6 @@ export const QRPreview: React.FC = () => {
 
   return (
     <div className="space-y-3" data-tour="qr-preview">
-      {/* 生成状態 */}
-      {isGenerating && (
-        <div className="flex items-center justify-center space-x-3 text-blue-600 bg-blue-50 border border-blue-200 rounded-lg py-2">
-          <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
-          <span className="text-sm font-medium">QRコードを生成中...</span>
-        </div>
-      )}
-
       {/* QRコード表示エリア */}
       <div className="border-2 border-gray-200 rounded-xl bg-white p-4 xl:p-6 shadow-inner">
         {!(qrStore.url || '').trim() ? (
@@ -82,6 +74,7 @@ export const QRPreview: React.FC = () => {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -93,8 +86,11 @@ export const QRPreview: React.FC = () => {
               <h3 className="text-sm xl:text-base font-medium text-gray-600 mb-1">
                 QRコードを生成しましょう
               </h3>
-              <p className="text-gray-500 text-xs xl:text-sm">
+              <p className="text-gray-500 text-xs xl:text-sm mb-3">
                 URL/テキストを入力してください
+              </p>
+              <p className="text-gray-400 text-xs">
+                ↓ プリセットからすぐ試せます
               </p>
             </div>
           </div>
@@ -123,16 +119,19 @@ export const QRPreview: React.FC = () => {
         ) : (
           <div className="flex items-center justify-center">
             <div className="relative">
-              {isGenerating && (
-                <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10 rounded-lg">
-                  <div className="animate-spin rounded-full h-8 w-8 border-3 border-blue-500 border-t-transparent"></div>
-                </div>
-              )}
               <canvas
                 ref={canvasRef}
                 className="max-w-full h-auto rounded-lg shadow-md border border-gray-200"
                 style={{ maxHeight: '300px', maxWidth: '300px' }}
+                role="img"
+                aria-label={qrStore.url ? `${qrStore.url} のQRコード` : 'QRコード'}
+                aria-busy={isGenerating}
               />
+              {isGenerating && (
+                <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10 rounded-lg">
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
+                </div>
+              )}
             </div>
           </div>
         )}

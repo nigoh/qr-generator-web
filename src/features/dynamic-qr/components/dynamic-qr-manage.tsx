@@ -1,15 +1,18 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Badge } from "@/components/ui/badge"
 import type { DynamicLink, UpdateLinkRequest } from "@/features/dynamic-qr/types"
 
 interface DynamicQRManageProps {
   isLoading: boolean
   currentLink: DynamicLink | null
+  links?: DynamicLink[]
   onFetch: (code: string) => void
   onUpdate: (code: string, req: UpdateLinkRequest) => void
   onDisable: (code: string) => void
+  onFetchList?: (limit?: number) => Promise<void>
 }
 
 function statusLabel(status: DynamicLink["status"]): string {
@@ -18,22 +21,31 @@ function statusLabel(status: DynamicLink["status"]): string {
   return "期限切れ"
 }
 
-function statusBadgeClass(status: DynamicLink["status"]): string {
-  if (status === "active") return "bg-emerald-100 text-emerald-700"
-  if (status === "disabled") return "bg-slate-100 text-slate-600"
-  return "bg-amber-100 text-amber-700"
+function statusVariant(status: DynamicLink["status"]): "default" | "secondary" | "outline" {
+  if (status === "active") return "default"
+  if (status === "disabled") return "secondary"
+  return "outline"
 }
 
 export function DynamicQRManage({
   isLoading,
   currentLink,
+  links = [],
   onFetch,
   onUpdate,
   onDisable,
+  onFetchList,
 }: DynamicQRManageProps) {
   const [code, setCode] = useState("")
   const [newTargetUrl, setNewTargetUrl] = useState("")
   const [newExpiresAt, setNewExpiresAt] = useState("")
+
+  useEffect(() => {
+    if (onFetchList) {
+      void onFetchList(20)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function handleFetch(e: React.FormEvent) {
     e.preventDefault()
@@ -53,6 +65,43 @@ export function DynamicQRManage({
 
   return (
     <div className="space-y-6">
+      {/* 作成済みリンク一覧 */}
+      {links.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold text-slate-700">作成済みリンク一覧</p>
+            {onFetchList && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => void onFetchList(20)}
+                disabled={isLoading}
+                className="text-xs"
+              >
+                更新
+              </Button>
+            )}
+          </div>
+          <div className="rounded-xl border border-slate-200 divide-y divide-slate-100 overflow-hidden">
+            {links.map((link) => (
+              <button
+                key={link.code}
+                type="button"
+                onClick={() => { setCode(link.code); onFetch(link.code); }}
+                className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors text-sm"
+              >
+                <span className="font-mono text-slate-800 shrink-0">{link.code}</span>
+                <span className="flex-1 truncate text-slate-500 text-xs">{link.target_url}</span>
+                <Badge variant={statusVariant(link.status)} className="shrink-0">
+                  {statusLabel(link.status)}
+                </Badge>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* コード検索 */}
       <form onSubmit={handleFetch} className="flex gap-2">
         <div className="flex-1 space-y-1.5">
@@ -77,11 +126,9 @@ export function DynamicQRManage({
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3 text-sm">
           <div className="flex items-center justify-between">
             <span className="font-mono font-semibold text-slate-800">{currentLink.code}</span>
-            <span
-              className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusBadgeClass(currentLink.status)}`}
-            >
+            <Badge variant={statusVariant(currentLink.status)}>
               {statusLabel(currentLink.status)}
-            </span>
+            </Badge>
           </div>
 
           <div>

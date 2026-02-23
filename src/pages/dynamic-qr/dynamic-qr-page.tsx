@@ -22,10 +22,12 @@ export function DynamicQRPage({ onClose }: DynamicQRPageProps) {
     error,
     lastCreated,
     currentLink,
+    links,
     create,
     fetch: fetchLink,
     update,
     disable,
+    fetchList,
     clearError,
     resetLastCreated,
   } = useDynamicQR()
@@ -123,9 +125,11 @@ export function DynamicQRPage({ onClose }: DynamicQRPageProps) {
           <DynamicQRManage
             isLoading={isLoading}
             currentLink={currentLink}
+            links={links}
             onFetch={fetchLink}
             onUpdate={update}
             onDisable={disable}
+            onFetchList={fetchList}
           />
         </FeatureContent>
       </div>

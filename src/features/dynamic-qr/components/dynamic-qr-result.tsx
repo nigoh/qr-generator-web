@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react"
+import { toast } from "sonner"
 import QRCode from "qrcode"
 import { Button } from "@/components/ui/button"
 import type { CreateLinkResponse } from "@/features/dynamic-qr/types"
@@ -23,7 +24,7 @@ export function DynamicQRResult({ result, onReset }: DynamicQRResultProps) {
 
   function handleCopy() {
     navigator.clipboard.writeText(result.redirect_url).catch(() => {
-      // clipboard API が使えない環境では何もしない
+      toast.error('URLのコピーに失敗しました。手動でコピーしてください。')
     })
   }
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { useQRStore } from '../store/qrStore';
 import { FileUpload } from './ui/FileUpload';
 import { Slider } from './ui';
@@ -43,7 +44,7 @@ export const LogoSettingsForm: React.FC = () => {
       setBgColor(bgColor);
     } catch (error) {
       console.error('Failed to extract colors from logo image:', error);
-      alert('画像から色を抽出できませんでした');
+      toast.error('画像から色を抽出できませんでした');
     } finally {
       setIsApplyingImageColors(false);
     }
@@ -59,6 +60,10 @@ export const LogoSettingsForm: React.FC = () => {
           preview={logoPreview}
           label="ロゴ画像をアップロード"
         />
+        <p className="mt-1.5 text-xs text-amber-600">
+          <span aria-hidden="true">⚠️</span>{' '}
+          ロゴはページを閉じるとリセットされます（ブラウザのセッション内のみ保持）。
+        </p>
       </div>
 
       {/* ロゴプレビュー */}
