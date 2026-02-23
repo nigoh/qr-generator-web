@@ -4,11 +4,6 @@ import { useDynamicQR } from "./use-dynamic-qr"
 import * as api from "@/features/dynamic-qr/services/dynamic-qr-api"
 import type { CreateLinkResponse, DynamicLink } from "@/features/dynamic-qr/types"
 
-const mockConfig = {
-  workerBaseUrl: "https://qr.example.com",
-  adminToken: "test-token",
-}
-
 const mockCreated: CreateLinkResponse = {
   code: "abc123",
   redirect_url: "https://qr.example.com/r/abc123",
@@ -31,7 +26,7 @@ describe("useDynamicQR", () => {
   })
 
   it("starts with empty state", () => {
-    const { result } = renderHook(() => useDynamicQR(mockConfig))
+    const { result } = renderHook(() => useDynamicQR())
     expect(result.current.isLoading).toBe(false)
     expect(result.current.error).toBeNull()
     expect(result.current.lastCreated).toBeNull()
@@ -41,7 +36,7 @@ describe("useDynamicQR", () => {
 
   it("creates a link and stores lastCreated", async () => {
     vi.spyOn(api, "createLink").mockResolvedValue(mockCreated)
-    const { result } = renderHook(() => useDynamicQR(mockConfig))
+    const { result } = renderHook(() => useDynamicQR())
 
     let response: CreateLinkResponse | null = null
     await act(async () => {
@@ -58,7 +53,7 @@ describe("useDynamicQR", () => {
 
   it("sets error when create fails", async () => {
     vi.spyOn(api, "createLink").mockRejectedValue(new Error("HTTP 500"))
-    const { result } = renderHook(() => useDynamicQR(mockConfig))
+    const { result } = renderHook(() => useDynamicQR())
 
     await act(async () => {
       await result.current.create({ target_url: "https://example.com" })
@@ -68,19 +63,22 @@ describe("useDynamicQR", () => {
     expect(result.current.lastCreated).toBeNull()
   })
 
-  it("sets error when config is missing", async () => {
-    const { result } = renderHook(() => useDynamicQR({}))
+  it("returns null and sets error on network failure", async () => {
+    vi.spyOn(api, "createLink").mockRejectedValue(new Error("fetch failed"))
+    const { result } = renderHook(() => useDynamicQR())
 
+    let response: CreateLinkResponse | null = null
     await act(async () => {
-      await result.current.create({ target_url: "https://example.com" })
+      response = await result.current.create({ target_url: "https://example.com" })
     })
 
-    expect(result.current.error).toBe("Worker URL と管理トークンを設定してください")
+    expect(response).toBeNull()
+    expect(result.current.error).toBe("fetch failed")
   })
 
   it("fetches and stores currentLink", async () => {
     vi.spyOn(api, "getLink").mockResolvedValue(mockLink)
-    const { result } = renderHook(() => useDynamicQR(mockConfig))
+    const { result } = renderHook(() => useDynamicQR())
 
     await act(async () => {
       await result.current.fetch("abc123")
@@ -92,7 +90,7 @@ describe("useDynamicQR", () => {
   it("disables a link", async () => {
     const disabled = { ...mockLink, status: "disabled" as const }
     vi.spyOn(api, "disableLink").mockResolvedValue(disabled)
-    const { result } = renderHook(() => useDynamicQR(mockConfig))
+    const { result } = renderHook(() => useDynamicQR())
 
     await act(async () => {
       await result.current.disable("abc123")
@@ -103,7 +101,7 @@ describe("useDynamicQR", () => {
 
   it("clearError resets error state", async () => {
     vi.spyOn(api, "createLink").mockRejectedValue(new Error("fail"))
-    const { result } = renderHook(() => useDynamicQR(mockConfig))
+    const { result } = renderHook(() => useDynamicQR())
 
     await act(async () => {
       await result.current.create({ target_url: "https://example.com" })

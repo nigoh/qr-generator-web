@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react"
+import { HashRouter, Route, Routes, useNavigate } from "react-router-dom"
 import { FileText, Image, Palette } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Footer, Header } from "@/components/layout"
@@ -14,28 +15,21 @@ import { CollapsibleSection } from "@/components/ui/CollapsibleSection"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TourGuidePage } from "@/pages/tour-guide/tour-guide-page"
 import { DynamicQRPage } from "@/pages/dynamic-qr/dynamic-qr-page"
+import { LoginPage } from "@/pages/auth/login-page"
+import { VCardPage } from "@/pages/vcard/vcard-page"
+import { AuthProvider, ProtectedRoute } from "@/features/auth"
 
 const QRGeneratorApp: React.FC = () => {
   const [isTourGuideOpen, setIsTourGuideOpen] = useState(false)
-  const [isDynamicQROpen, setIsDynamicQROpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const navigate = useNavigate()
 
   const handleOpenTourGuide = useCallback(() => {
     setIsTourGuideOpen(true)
-    setIsDynamicQROpen(false)
   }, [])
 
   const handleCloseTourGuide = useCallback(() => {
     setIsTourGuideOpen(false)
-  }, [])
-
-  const handleOpenDynamicQR = useCallback(() => {
-    setIsDynamicQROpen(true)
-    setIsTourGuideOpen(false)
-  }, [])
-
-  const handleCloseDynamicQR = useCallback(() => {
-    setIsDynamicQROpen(false)
   }, [])
 
   return (
@@ -48,11 +42,11 @@ const QRGeneratorApp: React.FC = () => {
           onCloseTourGuide={handleCloseTourGuide}
           extraActions={
             <Button
-              variant={isDynamicQROpen ? "secondary" : "ghost"}
+              variant="ghost"
               size="sm"
-              onClick={isDynamicQROpen ? handleCloseDynamicQR : handleOpenDynamicQR}
+              onClick={() => navigate("/dynamic-qr")}
             >
-              {isDynamicQROpen ? "ツールに戻る" : "時限QR"}
+              時限QR
             </Button>
           }
         />
@@ -63,10 +57,6 @@ const QRGeneratorApp: React.FC = () => {
         {isTourGuideOpen ? (
           <div className="h-full overflow-auto mx-auto w-full max-w-none px-2 sm:px-4 lg:px-6 xl:px-8">
             <TourGuidePage onClose={handleCloseTourGuide} />
-          </div>
-        ) : isDynamicQROpen ? (
-          <div className="h-full overflow-auto mx-auto w-full max-w-none px-2 sm:px-4 lg:px-6 xl:px-8">
-            <DynamicQRPage onClose={handleCloseDynamicQR} />
           </div>
         ) : (
           <>
@@ -178,7 +168,36 @@ const QRGeneratorApp: React.FC = () => {
         <Footer />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default QRGeneratorApp;
+function App() {
+  return (
+    <HashRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<QRGeneratorApp />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/dynamic-qr"
+            element={
+              <ProtectedRoute>
+                <DynamicQRPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/vcard"
+            element={
+              <ProtectedRoute>
+                <VCardPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
+    </HashRouter>
+  )
+}
+
+export default App

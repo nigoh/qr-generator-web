@@ -1,6 +1,5 @@
 export { DynamicQRCreateForm } from "./components/dynamic-qr-create-form"
 export { DynamicQRResult } from "./components/dynamic-qr-result"
 export { DynamicQRManage } from "./components/dynamic-qr-manage"
-export { DynamicQRConfigForm } from "./components/dynamic-qr-config-form"
 export { useDynamicQR } from "./hooks/use-dynamic-qr"
 export * from "./types"

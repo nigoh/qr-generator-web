@@ -10,7 +10,6 @@ import type {
   CreateLinkRequest,
   CreateLinkResponse,
   DynamicLink,
-  DynamicQRConfig,
   UpdateLinkRequest,
 } from "@/features/dynamic-qr/types"
 
@@ -32,11 +31,7 @@ interface UseDynamicQRResult extends UseDynamicQRState {
   resetLastCreated: () => void
 }
 
-function isConfigured(config: Partial<DynamicQRConfig>): config is DynamicQRConfig {
-  return Boolean(config.workerBaseUrl) && Boolean(config.adminToken)
-}
-
-export function useDynamicQR(config: Partial<DynamicQRConfig>): UseDynamicQRResult {
+export function useDynamicQR(): UseDynamicQRResult {
   const [state, setState] = useState<UseDynamicQRState>({
     isLoading: false,
     error: null,
@@ -63,92 +58,57 @@ export function useDynamicQR(config: Partial<DynamicQRConfig>): UseDynamicQRResu
 
   const create = useCallback(
     async (req: CreateLinkRequest): Promise<CreateLinkResponse | null> => {
-      if (!isConfigured(config)) {
-        setState((prev) => ({
-          ...prev,
-          error: "Worker URL と管理トークンを設定してください",
-        }))
-        return null
-      }
       return withLoading(async () => {
-        const response = await createLink(req, config)
+        const response = await createLink(req)
         setState((prev) => ({ ...prev, lastCreated: response }))
         return response
       })
     },
-    [config, withLoading],
+    [withLoading],
   )
 
   const fetch = useCallback(
     async (code: string): Promise<DynamicLink | null> => {
-      if (!isConfigured(config)) {
-        setState((prev) => ({
-          ...prev,
-          error: "Worker URL と管理トークンを設定してください",
-        }))
-        return null
-      }
       return withLoading(async () => {
-        const link = await getLink(code, config)
+        const link = await getLink(code)
         setState((prev) => ({ ...prev, currentLink: link }))
         return link
       })
     },
-    [config, withLoading],
+    [withLoading],
   )
 
   const update = useCallback(
     async (code: string, req: UpdateLinkRequest): Promise<DynamicLink | null> => {
-      if (!isConfigured(config)) {
-        setState((prev) => ({
-          ...prev,
-          error: "Worker URL と管理トークンを設定してください",
-        }))
-        return null
-      }
       return withLoading(async () => {
-        const link = await updateLink(code, req, config)
+        const link = await updateLink(code, req)
         setState((prev) => ({ ...prev, currentLink: link }))
         return link
       })
     },
-    [config, withLoading],
+    [withLoading],
   )
 
   const disable = useCallback(
     async (code: string): Promise<DynamicLink | null> => {
-      if (!isConfigured(config)) {
-        setState((prev) => ({
-          ...prev,
-          error: "Worker URL と管理トークンを設定してください",
-        }))
-        return null
-      }
       return withLoading(async () => {
-        const link = await disableLink(code, config)
+        const link = await disableLink(code)
         setState((prev) => ({ ...prev, currentLink: link }))
         return link
       })
     },
-    [config, withLoading],
+    [withLoading],
   )
 
   const fetchList = useCallback(
     async (limit = 20, cursor?: string): Promise<void> => {
-      if (!isConfigured(config)) {
-        setState((prev) => ({
-          ...prev,
-          error: "Worker URL と管理トークンを設定してください",
-        }))
-        return
-      }
       await withLoading(async () => {
-        const result = await listLinks(config, limit, cursor)
+        const result = await listLinks(limit, cursor)
         setState((prev) => ({ ...prev, links: result.links }))
         return result
       })
     },
-    [config, withLoading],
+    [withLoading],
   )
 
   const clearError = useCallback(() => {

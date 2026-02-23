@@ -1,6 +1,8 @@
 import type { ReactNode } from "react"
-import { Github, QrCode } from "lucide-react"
+import { Github, LogIn, LogOut, QrCode } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/features/auth"
 
 export interface HeaderProps {
   isTourGuideOpen?: boolean
@@ -15,6 +17,9 @@ export const Header: React.FC<HeaderProps> = ({
   onCloseTourGuide,
   extraActions,
 }) => {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
   const handleTourToggle = () => {
     if (isTourGuideOpen) {
       onCloseTourGuide?.()
@@ -52,6 +57,53 @@ export const Header: React.FC<HeaderProps> = ({
             >
               {isTourGuideOpen ? "ツールに戻る" : "ツアーを見る"}
             </Button>
+            {user ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/dynamic-qr")}
+                >
+                  時限QR
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/vcard")}
+                >
+                  vCard
+                </Button>
+                {user.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt={user.name ?? user.email ?? "ユーザー"}
+                    className="h-8 w-8 rounded-full object-cover"
+                  />
+                ) : null}
+                <span className="hidden text-sm font-medium text-gray-700 sm:block">
+                  {user.name ?? user.email}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={logout}
+                  aria-label="ログアウト"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline ml-1">ログアウト</span>
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/login")}
+                aria-label="ログイン"
+              >
+                <LogIn className="h-4 w-4" />
+                <span className="hidden sm:inline ml-1">ログイン</span>
+              </Button>
+            )}
             <a
               href="https://github.com/nigoh"
               target="_blank"

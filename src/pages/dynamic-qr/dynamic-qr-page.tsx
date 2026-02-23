@@ -2,41 +2,20 @@ import { useCallback, useState } from "react"
 import { FeatureContent, FeatureHeader, FeatureLayout } from "@/components/layout"
 import type { FeatureHeaderButton } from "@/components/layout"
 import {
-  DynamicQRConfigForm,
   DynamicQRCreateForm,
   DynamicQRManage,
   DynamicQRResult,
   useDynamicQR,
 } from "@/features/dynamic-qr"
-import type { DynamicQRConfig } from "@/features/dynamic-qr"
 
-type ActiveTab = "create" | "manage" | "config"
+type ActiveTab = "create" | "manage"
 
 interface DynamicQRPageProps {
-  onClose: () => void
-}
-
-function loadConfig(): Partial<DynamicQRConfig> {
-  try {
-    const raw = sessionStorage.getItem("dynamic-qr:config")
-    if (!raw) return {}
-    return JSON.parse(raw) as Partial<DynamicQRConfig>
-  } catch {
-    return {}
-  }
-}
-
-function saveConfig(config: DynamicQRConfig) {
-  try {
-    sessionStorage.setItem("dynamic-qr:config", JSON.stringify(config))
-  } catch {
-    // ignore
-  }
+  onClose?: () => void
 }
 
 export function DynamicQRPage({ onClose }: DynamicQRPageProps) {
   const [activeTab, setActiveTab] = useState<ActiveTab>("create")
-  const [config, setConfig] = useState<Partial<DynamicQRConfig>>(loadConfig)
 
   const {
     isLoading,
@@ -49,13 +28,7 @@ export function DynamicQRPage({ onClose }: DynamicQRPageProps) {
     disable,
     clearError,
     resetLastCreated,
-  } = useDynamicQR(config)
-
-  const handleSaveConfig = useCallback((newConfig: DynamicQRConfig) => {
-    setConfig(newConfig)
-    saveConfig(newConfig)
-    setActiveTab("create")
-  }, [])
+  } = useDynamicQR()
 
   const handleReset = useCallback(() => {
     clearError()
@@ -65,17 +38,11 @@ export function DynamicQRPage({ onClose }: DynamicQRPageProps) {
   const tabs: { id: ActiveTab; label: string }[] = [
     { id: "create", label: "作成" },
     { id: "manage", label: "管理" },
-    { id: "config", label: "設定" },
   ]
 
-  const headerButtons: FeatureHeaderButton[] = [
-    {
-      text: "生成画面に戻る",
-      onClick: onClose,
-      variant: "outline",
-      size: "sm",
-    },
-  ]
+  const headerButtons: FeatureHeaderButton[] = onClose
+    ? [{ text: "生成画面に戻る", onClick: onClose, variant: "outline", size: "sm" }]
+    : []
 
   return (
     <FeatureLayout maxWidth="xl">
@@ -160,24 +127,6 @@ export function DynamicQRPage({ onClose }: DynamicQRPageProps) {
             onUpdate={update}
             onDisable={disable}
           />
-        </FeatureContent>
-      </div>
-
-      {/* パネル: 設定 */}
-      <div
-        role="tabpanel"
-        id="dqr-panel-config"
-        aria-labelledby="dqr-tab-config"
-        hidden={activeTab !== "config"}
-      >
-        <FeatureContent variant="paper" padding="md">
-          <div className="max-w-lg space-y-4">
-            <p className="text-sm text-slate-600">
-              Cloudflare Workers のデプロイ先と管理 API トークンを設定してください。
-              設定値はブラウザのセッションストレージに保持されます（タブを閉じると削除）。
-            </p>
-            <DynamicQRConfigForm config={config} onSave={handleSaveConfig} />
-          </div>
         </FeatureContent>
       </div>
     </FeatureLayout>
