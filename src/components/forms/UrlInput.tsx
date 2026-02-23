@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQRStore } from '../../store/qrStore';
 import { Input, Label, Button, Tabs, TabsContent, TabsList, TabsTrigger } from '../ui';
 import { VCardForm } from '../../features/vcard/components/VCardForm';
-import { Link, Contact, MapPin, MessageSquare, Calendar } from 'lucide-react';
+import { Link, Contact, MapPin, MessageSquare, Calendar, Mail, Phone, Wifi } from 'lucide-react';
 
 export const UrlInput: React.FC = () => {
   const { url, setUrl } = useQRStore();
@@ -79,6 +79,7 @@ export const UrlInput: React.FC = () => {
                 className="min-h-[44px] sm:min-h-0"
                 onClick={() => setUrl('mailto:info@example.com')}
               >
+                <Mail className="h-3.5 w-3.5 mr-1" />
                 メール
               </Button>
               <Button
@@ -88,6 +89,7 @@ export const UrlInput: React.FC = () => {
                 className="min-h-[44px] sm:min-h-0"
                 onClick={() => setUrl('tel:+81-90-1234-5678')}
               >
+                <Phone className="h-3.5 w-3.5 mr-1" />
                 電話番号
               </Button>
               <Button
@@ -99,6 +101,7 @@ export const UrlInput: React.FC = () => {
                   setUrl('WIFI:T:WPA;S:MyNetwork;P:password123;H:false;;')
                 }
               >
+                <Wifi className="h-3.5 w-3.5 mr-1" />
                 Wi-Fi
               </Button>
               <Button
