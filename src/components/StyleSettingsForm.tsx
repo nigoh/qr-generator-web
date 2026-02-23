@@ -16,13 +16,25 @@ export const StyleSettingsForm: React.FC = () => {
   const {
     fgColor,
     bgColor,
+    fgGradientEnd,
     dotStyle,
     setFgColor,
     setBgColor,
+    setFgGradientEnd,
     setDotStyle,
   } = useQRStore();
   const presets = getQRColorPresets();
   const contrast = getContrastRatio(fgColor, bgColor);
+  const gradientEnabled = fgGradientEnd !== '';
+
+  const handleGradientToggle = () => {
+    if (gradientEnabled) {
+      setFgGradientEnd('');
+    } else {
+      // デフォルトのグラデーション終端色（紫系）
+      setFgGradientEnd('#6366f1');
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -30,7 +42,7 @@ export const StyleSettingsForm: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 前景色（ドット） */}
         <ColorPicker
-          label="ドットの色"
+          label="ドットの色（開始色）"
           value={fgColor}
           onChange={setFgColor}
         />
@@ -41,6 +53,51 @@ export const StyleSettingsForm: React.FC = () => {
           value={bgColor}
           onChange={setBgColor}
         />
+      </div>
+
+      {/* グラデーション設定 */}
+      <div className="space-y-3 p-3 border border-gray-200 rounded-lg bg-gray-50">
+        <div className="flex items-center justify-between">
+          <Label className="cursor-pointer select-none" htmlFor="gradient-toggle">
+            グラデーション
+          </Label>
+          <button
+            id="gradient-toggle"
+            type="button"
+            role="switch"
+            aria-checked={gradientEnabled}
+            onClick={handleGradientToggle}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
+              gradientEnabled ? 'bg-blue-600' : 'bg-gray-300'
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                gradientEnabled ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
+
+        {gradientEnabled && (
+          <div className="space-y-2">
+            <ColorPicker
+              label="グラデーション終端色"
+              value={fgGradientEnd}
+              onChange={setFgGradientEnd}
+            />
+            <div
+              className="h-6 w-full rounded border border-gray-300"
+              style={{
+                background: `linear-gradient(to right, ${fgColor}, ${fgGradientEnd})`,
+              }}
+              aria-label="グラデーションプレビュー"
+            />
+            <p className="text-xs text-gray-500">
+              左上から右下へのグラデーションがQRコード全体に適用されます。
+            </p>
+          </div>
+        )}
       </div>
 
       {/* ドットスタイル */}
@@ -92,10 +149,17 @@ export const StyleSettingsForm: React.FC = () => {
         <h4 className="text-sm font-medium text-gray-700 mb-3">カラープレビュー</h4>
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <div 
-              className="w-6 h-6 border border-gray-300 rounded"
-              style={{ backgroundColor: fgColor }}
-            />
+            {gradientEnabled ? (
+              <div
+                className="w-6 h-6 border border-gray-300 rounded"
+                style={{ background: `linear-gradient(135deg, ${fgColor}, ${fgGradientEnd})` }}
+              />
+            ) : (
+              <div 
+                className="w-6 h-6 border border-gray-300 rounded"
+                style={{ backgroundColor: fgColor }}
+              />
+            )}
             <span className="text-sm text-gray-600">ドット</span>
           </div>
           <div className="flex items-center space-x-2">

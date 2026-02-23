@@ -13,6 +13,7 @@ interface QRState {
   // 色設定
   fgColor: string;
   bgColor: string;
+  fgGradientEnd: string;
   
   // スタイル設定
   dotStyle: QRSettings['dotStyle'];
@@ -32,6 +33,7 @@ interface QRState {
   setErrorCorrection: (level: QRSettings['errorCorrection']) => void;
   setFgColor: (color: string) => void;
   setBgColor: (color: string) => void;
+  setFgGradientEnd: (color: string) => void;
   setDotStyle: (style: QRSettings['dotStyle']) => void;
   setBoxSize: (size: number) => void;
   setBorder: (border: number) => void;
@@ -53,6 +55,7 @@ export const useQRStore = create<QRState>()(
       // デフォルト色: 高コントラストで目に優しい配色（Tailwind gray-900 on gray-50 相当）
       fgColor: '#111827',
       bgColor: '#F9FAFB',
+      fgGradientEnd: '',
       dotStyle: 'square',
       boxSize: 10,
       border: 4,
@@ -70,6 +73,7 @@ export const useQRStore = create<QRState>()(
       setErrorCorrection: (errorCorrection) => set({ errorCorrection }),
       setFgColor: (fgColor) => set({ fgColor }),
       setBgColor: (bgColor) => set({ bgColor }),
+      setFgGradientEnd: (fgGradientEnd) => set({ fgGradientEnd }),
       setDotStyle: (dotStyle) => set({ dotStyle }),
       setBoxSize: (boxSize) => set({ boxSize }),
       setBorder: (border) => set({ border }),
@@ -91,6 +95,7 @@ export const useQRStore = create<QRState>()(
           errorCorrection: state.errorCorrection,
           fgColor: state.fgColor,
           bgColor: state.bgColor,
+          fgGradientEnd: state.fgGradientEnd || undefined,
           dotStyle: state.dotStyle,
           boxSize: state.boxSize,
           border: state.border,
@@ -103,6 +108,7 @@ export const useQRStore = create<QRState>()(
         errorCorrection: state.errorCorrection,
         fgColor: state.fgColor,
         bgColor: state.bgColor,
+        fgGradientEnd: state.fgGradientEnd,
         dotStyle: state.dotStyle,
         boxSize: state.boxSize,
         border: state.border,

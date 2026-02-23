@@ -3,6 +3,8 @@ export interface QRSettings {
   errorCorrection: 'L' | 'M' | 'Q' | 'H';
   fgColor: string;
   bgColor: string;
+  /** グラデーション終端色。空文字またはundefinedの場合はグラデーションなし */
+  fgGradientEnd?: string;
   dotStyle: 'square' | 'circle' | 'rounded' | 'diamond';
   boxSize: number;
   border: number;

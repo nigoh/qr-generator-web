@@ -98,8 +98,15 @@ export const generateQRCode = async (
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, totalSize, totalSize);
 
-    // QRコードを描画
-    ctx.fillStyle = fgColor;
+    // グラデーションまたは単色でドットの色を設定
+    if (options.fgGradientEnd) {
+      const gradient = ctx.createLinearGradient(0, 0, totalSize, totalSize);
+      gradient.addColorStop(0, fgColor);
+      gradient.addColorStop(1, options.fgGradientEnd);
+      ctx.fillStyle = gradient;
+    } else {
+      ctx.fillStyle = fgColor;
+    }
 
     for (let row = 0; row < size; row++) {
       for (let col = 0; col < size; col++) {
@@ -236,7 +243,7 @@ const drawLogo = async (
  */
 export const generateQRSVG = async (
   text: string,
-  options: Pick<QRSettings, 'errorCorrection' | 'fgColor' | 'bgColor' | 'dotStyle' | 'boxSize' | 'border'>
+  options: Pick<QRSettings, 'errorCorrection' | 'fgColor' | 'bgColor' | 'fgGradientEnd' | 'dotStyle' | 'boxSize' | 'border'>
 ): Promise<string> => {
   const qrMatrix = await generateQRMatrix(text, { errorCorrection: options.errorCorrection });
   const { modules, size } = qrMatrix;
@@ -284,12 +291,21 @@ export const generateQRSVG = async (
     }
   }
 
+  const dotFill = options.fgGradientEnd ? 'url(#qr-gradient)' : fgColor;
+  const gradientDefs = options.fgGradientEnd ? `
+  <defs>
+    <linearGradient id="qr-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="${fgColor}" />
+      <stop offset="100%" stop-color="${options.fgGradientEnd}" />
+    </linearGradient>
+  </defs>` : '';
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1"
      viewBox="0 0 ${totalSize} ${totalSize}"
-     width="${totalSize}" height="${totalSize}">
+     width="${totalSize}" height="${totalSize}">${gradientDefs}
   <rect width="${totalSize}" height="${totalSize}" fill="${bgColor}" />
-  <g fill="${fgColor}">
+  <g fill="${dotFill}">
     ${paths.join('\n    ')}
   </g>
 </svg>`;
