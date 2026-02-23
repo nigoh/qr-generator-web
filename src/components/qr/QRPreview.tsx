@@ -73,12 +73,12 @@ export const QRPreview: React.FC = () => {
       )}
 
       {/* QRコード表示エリア */}
-      <div className="border-2 border-gray-200 rounded-xl bg-white p-6 shadow-inner">
+      <div className="border-2 border-gray-200 rounded-xl bg-white p-4 xl:p-6 shadow-inner">
         {!(qrStore.url || '').trim() ? (
-          <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-            <div className="text-center">
+          <div className="flex items-center justify-center aspect-square max-h-64 xl:h-64 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+            <div className="text-center px-4">
               <svg
-                className="w-12 h-12 text-gray-400 mx-auto mb-3"
+                className="w-10 h-10 xl:w-12 xl:h-12 text-gray-400 mx-auto mb-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -90,19 +90,19 @@ export const QRPreview: React.FC = () => {
                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <h3 className="text-base font-medium text-gray-600 mb-1">
+              <h3 className="text-sm xl:text-base font-medium text-gray-600 mb-1">
                 QRコードを生成しましょう
               </h3>
-              <p className="text-gray-500 text-sm">
+              <p className="text-gray-500 text-xs xl:text-sm">
                 URL/テキストを入力してください
               </p>
             </div>
           </div>
         ) : error ? (
-          <div className="flex items-center justify-center h-64 bg-red-50 border-2 border-dashed border-red-300 rounded-lg">
-            <div className="text-center">
+          <div className="flex items-center justify-center aspect-square max-h-64 xl:h-64 bg-red-50 border-2 border-dashed border-red-300 rounded-lg">
+            <div className="text-center px-4">
               <svg
-                className="w-12 h-12 text-red-400 mx-auto mb-3"
+                className="w-10 h-10 xl:w-12 xl:h-12 text-red-400 mx-auto mb-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -114,10 +114,10 @@ export const QRPreview: React.FC = () => {
                   d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <h3 className="text-base font-medium text-red-600 mb-1">
+              <h3 className="text-sm xl:text-base font-medium text-red-600 mb-1">
                 エラーが発生しました
               </h3>
-              <p className="text-red-500 text-sm">{error}</p>
+              <p className="text-red-500 text-xs xl:text-sm">{error}</p>
             </div>
           </div>
         ) : (
@@ -138,9 +138,9 @@ export const QRPreview: React.FC = () => {
         )}
       </div>
 
-      {/* QRコード情報パネル */}
+      {/* QRコード情報パネル（デスクトップのみ表示） */}
       {qrSize.width > 0 && !error && (
-        <div className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg p-3">
+        <div className="hidden xl:block bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg p-3">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
             <div className="text-center">
               <div className="text-sm font-bold text-gray-800">{qrSize.width} × {qrSize.height}</div>
