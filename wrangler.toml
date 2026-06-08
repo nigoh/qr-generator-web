@@ -1,0 +1,12 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "qr-dynamic-worker"
+main = "worker/index.ts"
+compatibility_date = "2025-01-01"
+
+# ビルド済みのSPA（Vite の出力先 dist/）を Static Assets として配信する。
+# Worker（main）から env.ASSETS で参照する。
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+# クライアントサイドルーティングのため、未マッチは index.html にフォールバックする。
+not_found_handling = "single-page-application"
