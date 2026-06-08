@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import clsx from 'clsx';
 
 interface CollapsibleSectionProps {
@@ -17,16 +17,22 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   'data-tour': dataTour,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const reactId = useId();
+  const buttonId = `${reactId}-trigger`;
+  const panelId = `${reactId}-panel`;
 
   return (
-    <div 
+    <div
       className={clsx('border border-gray-200 rounded-lg overflow-hidden', className)}
       data-tour={dataTour}
     >
       <button
+        id={buttonId}
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 text-left flex items-center justify-between transition-colors duration-200"
+        className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 text-left flex items-center justify-between transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
         aria-expanded={isOpen}
+        aria-controls={panelId}
       >
         <span className="font-medium text-gray-800">{title}</span>
         <svg
@@ -37,6 +43,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -46,12 +53,16 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           />
         </svg>
       </button>
-      
-      {isOpen && (
-        <div className="p-4 bg-white border-t border-gray-200">
-          {children}
-        </div>
-      )}
+
+      <div
+        id={panelId}
+        role="region"
+        aria-labelledby={buttonId}
+        hidden={!isOpen}
+        className="p-4 bg-white border-t border-gray-200"
+      >
+        {children}
+      </div>
     </div>
   );
 };

@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useQRStore } from '../../store/qrStore';
 import { generateQRCode, generateQRSVG } from '../../utils/qrGenerator';
 import { Button } from '../ui/button';
+import { SaveToLibraryButton } from './SaveToLibraryButton';
 import { Download, Copy, Share2, CheckCircle2 } from 'lucide-react';
+import { toast } from '../../hooks/useToast';
 
 export const DownloadButton: React.FC = () => {
   const qrStore = useQRStore();
@@ -16,7 +18,7 @@ export const DownloadButton: React.FC = () => {
 
   const handleDownload = async (format: 'png' | 'jpg' = 'png') => {
     if (!qrStore.url.trim()) {
-      alert('QRコードに埋め込むテキストを入力してください');
+      toast.error('QRコードに埋め込むテキストを入力してください');
       return;
     }
 
@@ -49,7 +51,7 @@ export const DownloadButton: React.FC = () => {
       document.body.removeChild(link);
     } catch (error) {
       console.error('Download failed:', error);
-      alert('ダウンロードに失敗しました');
+      toast.error('ダウンロードに失敗しました');
     } finally {
       setIsDownloading(false);
     }
@@ -57,7 +59,7 @@ export const DownloadButton: React.FC = () => {
 
   const handleCopyToClipboard = async () => {
     if (!qrStore.url.trim()) {
-      alert('QRコードに埋め込むテキストを入力してください');
+      toast.error('QRコードに埋め込むテキストを入力してください');
       return;
     }
 
@@ -78,7 +80,7 @@ export const DownloadButton: React.FC = () => {
 
       canvas.toBlob(async (blob) => {
         if (!blob) {
-          alert('画像の生成に失敗しました');
+          toast.error('画像の生成に失敗しました');
           return;
         }
 
@@ -88,20 +90,21 @@ export const DownloadButton: React.FC = () => {
           ]);
           setCopySuccess(true);
           setTimeout(() => setCopySuccess(false), 2000);
+          toast.success('QRコード画像をコピーしました');
         } catch (error) {
           console.error('Clipboard copy failed:', error);
-          alert('クリップボードへのコピーに失敗しました');
+          toast.error('クリップボードへのコピーに失敗しました');
         }
       }, 'image/png');
     } catch (error) {
       console.error('Copy failed:', error);
-      alert('コピーに失敗しました');
+      toast.error('コピーに失敗しました');
     }
   };
 
   const handleDownloadSVG = async () => {
     if (!qrStore.url.trim()) {
-      alert('QRコードに埋め込むテキストを入力してください');
+      toast.error('QRコードに埋め込むテキストを入力してください');
       return;
     }
 
@@ -122,7 +125,7 @@ export const DownloadButton: React.FC = () => {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('SVG download failed:', error);
-      alert('SVGのダウンロードに失敗しました');
+      toast.error('SVGのダウンロードに失敗しました');
     } finally {
       setIsDownloading(false);
     }
@@ -237,6 +240,9 @@ export const DownloadButton: React.FC = () => {
           </Button>
         )}
       </div>
+
+      {/* ライブラリ保存 */}
+      <SaveToLibraryButton disabled={isDisabled} className="w-full min-h-[44px]" />
 
       {/* 出力情報カード */}
       <div className="bg-gradient-to-r from-gray-50 to-blue-50 border border-gray-200 rounded-xl p-3">

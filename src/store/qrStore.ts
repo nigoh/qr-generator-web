@@ -41,9 +41,15 @@ interface QRState {
   updateLogoSettings: (settings: Partial<LogoSettings>) => void;
   toggleLogoSection: () => void;
   toggleSettingsSection: () => void;
-  
+
   // 設定をまとめて取得
   getQRSettings: () => QRSettings;
+  // 保存済みQRなどから設定一式をまとめて復元
+  applySettings: (
+    settings: QRSettings,
+    logoSettings: LogoSettings,
+    logoFile: File | null
+  ) => void;
 }
 
 export const useQRStore = create<QRState>()(
@@ -101,6 +107,21 @@ export const useQRStore = create<QRState>()(
           border: state.border,
         };
       },
+
+      // 保存済みQRから設定一式をまとめて復元（プレビューは自動再生成される）
+      applySettings: (settings, logoSettings, logoFile) =>
+        set({
+          url: settings.url,
+          errorCorrection: settings.errorCorrection,
+          fgColor: settings.fgColor,
+          bgColor: settings.bgColor,
+          fgGradientEnd: settings.fgGradientEnd ?? '',
+          dotStyle: settings.dotStyle,
+          boxSize: settings.boxSize,
+          border: settings.border,
+          logoSettings,
+          logoFile,
+        }),
     }),
     {
       name: 'qr-generator-settings',

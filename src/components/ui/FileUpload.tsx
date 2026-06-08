@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useId, useRef } from 'react';
 import clsx from 'clsx';
 
 interface FileUploadProps {
@@ -21,6 +21,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   preview,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const reactId = useId();
+  const inputId = `${reactId}-file`;
+  const helpId = `${reactId}-help`;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -40,16 +43,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
   return (
     <div className={clsx('flex flex-col space-y-3', className)}>
-      <label className="text-sm font-medium text-gray-700">
+      <label htmlFor={inputId} className="text-sm font-medium text-gray-700">
         {label}
       </label>
-      
+
       {/* ファイル選択エリア */}
       <div className="flex items-center space-x-3">
         <button
           type="button"
           onClick={handleClick}
           disabled={disabled}
+          aria-label={`${label}：ファイルを選択`}
+          aria-describedby={helpId}
           className={clsx(
             'px-4 py-2 border border-gray-300 rounded-md text-sm font-medium',
             'bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
@@ -59,12 +64,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         >
           ファイルを選択
         </button>
-        
+
         {preview && (
           <button
             type="button"
             onClick={handleClear}
             disabled={disabled}
+            aria-label={`${label}：選択したファイルをクリア`}
             className={clsx(
               'px-3 py-2 border border-red-300 rounded-md text-sm font-medium',
               'bg-white text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500',
@@ -76,15 +82,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           </button>
         )}
       </div>
-      
+
       {/* 隠れたファイル入力 */}
       <input
+        id={inputId}
         ref={fileInputRef}
         type="file"
         accept={accept}
         onChange={handleFileChange}
         disabled={disabled}
         multiple={multiple}
+        aria-label={label}
+        aria-describedby={helpId}
         className="hidden"
       />
       
@@ -110,7 +119,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       )}
       
       {/* ヘルプテキスト */}
-      <p className="text-xs text-gray-500">
+      <p id={helpId} className="text-xs text-gray-500">
         対応形式: PNG, JPG, GIF, SVG （推奨: 正方形で透明背景のPNG）
       </p>
     </div>

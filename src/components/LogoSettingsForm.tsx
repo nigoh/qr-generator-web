@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQRStore } from '../store/qrStore';
 import { FileUpload } from './ui/FileUpload';
 import { Slider } from './ui';
 import { Label } from './ui';
 import { Button } from './ui';
 import { extractQRColorsFromImage } from '../utils/colorUtils';
+import { toast } from '../hooks/useToast';
 
 export const LogoSettingsForm: React.FC = () => {
   const {
@@ -19,19 +20,28 @@ export const LogoSettingsForm: React.FC = () => {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isApplyingImageColors, setIsApplyingImageColors] = useState(false);
 
-  // ロゴファイルが変更されたときの処理
+  // ストアの logoFile とプレビューを同期する。
+  // （ライブラリからの読み込みなど、このフォーム外で logoFile が
+  //  変更された場合にもプレビューを反映させる）
+  useEffect(() => {
+    if (!logoFile) {
+      setLogoPreview(null);
+      return;
+    }
+    let cancelled = false;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (!cancelled) setLogoPreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(logoFile);
+    return () => {
+      cancelled = true;
+    };
+  }, [logoFile]);
+
+  // ロゴファイルが変更されたときの処理（プレビューは上の useEffect が同期する）
   const handleLogoUpload = (file: File | null) => {
     setLogoFile(file);
-    
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setLogoPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setLogoPreview(null);
-    }
   };
 
   const handleApplyImageColors = async () => {
@@ -43,7 +53,7 @@ export const LogoSettingsForm: React.FC = () => {
       setBgColor(bgColor);
     } catch (error) {
       console.error('Failed to extract colors from logo image:', error);
-      alert('画像から色を抽出できませんでした');
+      toast.error('画像から色を抽出できませんでした');
     } finally {
       setIsApplyingImageColors(false);
     }

@@ -3,7 +3,7 @@ import { useQRStore } from '../store/qrStore';
 import { ColorPicker } from './ui/ColorPicker';
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui';
 import { Label } from './ui';
-import { getContrastRatio, getQRColorPresets } from '../utils/colorUtils';
+import { getContrastRatio, getQRColorPresets, hasGoodContrast } from '../utils/colorUtils';
 
 const DOT_STYLE_OPTIONS = [
   { value: 'square', label: '四角形（標準）' },
@@ -25,6 +25,7 @@ export const StyleSettingsForm: React.FC = () => {
   } = useQRStore();
   const presets = getQRColorPresets();
   const contrast = getContrastRatio(fgColor, bgColor);
+  const contrastOk = hasGoodContrast(fgColor, bgColor); // WCAG AA (4.5:1)
   const gradientEnabled = fgGradientEnd !== '';
 
   const handleGradientToggle = () => {
@@ -170,14 +171,18 @@ export const StyleSettingsForm: React.FC = () => {
             <span className="text-sm text-gray-600">背景</span>
           </div>
           <div className="flex-1" />
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-gray-500" aria-live="polite">
             コントラスト比: {contrast.toFixed(2)}:1
           </div>
         </div>
-        
-        {contrast < 3 && (
-          <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-700">
-            ⚠️ コントラスト比が低いため、QRコードが読み取りにくい可能性があります。
+
+        {contrastOk ? (
+          <div role="status" className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs text-green-700">
+            ✓ コントラスト比は十分です（WCAG AA基準の4.5:1以上）。
+          </div>
+        ) : (
+          <div role="alert" className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-700">
+            ⚠️ コントラスト比が低い（4.5:1未満）ため、QRコードが読み取りにくい可能性があります。色の組み合わせを見直すことをおすすめします。
           </div>
         )}
       </div>
