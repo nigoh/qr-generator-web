@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { Github, QrCode } from "lucide-react"
+import { Compass, Github, QrCode } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export interface HeaderProps {
@@ -24,39 +24,39 @@ export const Header: React.FC<HeaderProps> = ({
   }
 
   return (
-    <header className="border-b border-gray-200 bg-white shadow-sm">
+    <header className="border-b border-border bg-card/80 backdrop-blur-sm">
       <div className="mx-auto max-w-full px-3 sm:px-4 lg:px-6 xl:px-8">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-              <QrCode className="h-5 w-5 text-white" />
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-sm">
+              <QrCode className="h-5 w-5 text-primary-foreground" />
             </div>
-            <div className="hidden sm:block">
-              <h1 className="text-lg font-bold text-gray-900 sm:text-xl">
-                QRコード生成ツール
+            <div>
+              <h1 className="text-base font-semibold leading-tight text-foreground sm:text-lg">
+                QR Studio
               </h1>
-              <p className="text-xs text-gray-500 sm:text-sm">
-                カスタムQRコードを簡単作成
+              <p className="hidden text-xs text-muted-foreground sm:block">
+                カスタムQRコードを、美しく。
               </p>
             </div>
-            <div className="sm:hidden">
-              <h1 className="text-lg font-bold text-gray-900">QRコード</h1>
-            </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {extraActions}
             <Button
               variant={isTourGuideOpen ? "secondary" : "ghost"}
               size="sm"
               onClick={handleTourToggle}
             >
-              {isTourGuideOpen ? "ツールに戻る" : "ツアーを見る"}
+              <Compass className="h-4 w-4 sm:mr-1.5" aria-hidden="true" />
+              <span className="hidden sm:inline">
+                {isTourGuideOpen ? "ツールに戻る" : "ツアー"}
+              </span>
             </Button>
             <a
               href="https://github.com/nigoh"
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+              className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               aria-label="GitHub"
             >
               <Github className="h-5 w-5" />

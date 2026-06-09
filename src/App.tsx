@@ -52,7 +52,7 @@ const QRGeneratorApp: React.FC = () => {
   )
 
   return (
-    <div className="h-screen h-dvh flex flex-col overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 xl:min-h-screen xl:h-auto xl:overflow-auto">
+    <div className="h-screen h-dvh flex flex-col overflow-hidden bg-background xl:min-h-screen xl:h-auto xl:overflow-auto">
       {/* スキップリンク（キーボード利用者向け） */}
       <a
         href="#main-content"
@@ -103,7 +103,7 @@ const QRGeneratorApp: React.FC = () => {
               <div className="min-h-[calc(100vh-144px)] flex flex-col gap-4 py-4 lg:gap-6 xl:flex-row">
                 {/* 設定エリア */}
                 <section aria-label="QRコード設定" className="order-1 w-full xl:w-3/5">
-                  <Card className="flex min-h-full flex-col border shadow-sm">
+                  <Card className="flex min-h-full flex-col rounded-2xl border shadow-sm">
                     <CardHeader className="pb-4">
                       <div className="flex items-center justify-between gap-2">
                         <CardTitle className="text-lg font-bold sm:text-xl">
@@ -160,7 +160,7 @@ const QRGeneratorApp: React.FC = () => {
                 {/* プレビューエリア */}
                 <section aria-label="QRコードプレビュー" className="order-2 w-full xl:w-2/5">
                   <div className="sticky top-20">
-                    <Card className="border-2 shadow-lg">
+                    <Card className="rounded-2xl border shadow-lg shadow-zinc-900/5">
                       <CardHeader className="pb-4">
                         <CardTitle className="text-center text-lg font-bold sm:text-xl">
                           QRコードプレビュー
