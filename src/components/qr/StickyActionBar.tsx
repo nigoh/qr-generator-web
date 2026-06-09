@@ -37,6 +37,7 @@ export const StickyActionBar: React.FC<StickyActionBarProps> = ({ onOpenSettings
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      toast.success('PNG画像をダウンロードしました');
     } catch (error) {
       console.error('Download failed:', error);
       toast.error('ダウンロードに失敗しました');
@@ -103,16 +104,19 @@ export const StickyActionBar: React.FC<StickyActionBarProps> = ({ onOpenSettings
           text: qrStore.url,
           files: [file],
         });
+        toast.success('共有しました');
       } else if (navigator.share) {
         await navigator.share({
           title: 'QRコード',
           text: qrStore.url,
         });
+        toast.success('共有しました');
       }
     } catch (error) {
-      // User cancelled share or share not supported
+      // ユーザーが共有をキャンセルした場合（AbortError）は通知しない
       if (error instanceof Error && error.name !== 'AbortError') {
         console.error('Share failed:', error);
+        toast.error('共有に失敗しました');
       }
     }
   };

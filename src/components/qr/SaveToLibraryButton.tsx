@@ -42,6 +42,8 @@ export const SaveToLibraryButton: React.FC<SaveToLibraryButtonProps> = ({
     } catch (error) {
       console.error('Save to library failed:', error);
       toast.error('ライブラリへの保存に失敗しました');
+      // NameDialog を開いたままにして再試行可能にする
+      throw error;
     }
   };
 

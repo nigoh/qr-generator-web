@@ -3,8 +3,26 @@ import { useQRStore } from '../../store/qrStore';
 import { generateQRCode, generateQRSVG } from '../../utils/qrGenerator';
 import { Button } from '../ui/button';
 import { SaveToLibraryButton } from './SaveToLibraryButton';
-import { Download, Copy, Share2, CheckCircle2 } from 'lucide-react';
+import { Download, Copy, Share2, CheckCircle2, Image as ImageIcon, FileCode } from 'lucide-react';
 import { toast } from '../../hooks/useToast';
+
+/** プレビュー下のサブアクション用アイコンタイル（縦並びアイコン＋ラベル）。 */
+const ActionTile: React.FC<{
+  onClick: () => void;
+  disabled?: boolean;
+  icon: React.ReactNode;
+  label: string;
+}> = ({ onClick, disabled, icon, label }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    className="flex min-h-[64px] flex-col items-center justify-center gap-1.5 rounded-xl border border-input bg-card text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+  >
+    {icon}
+    <span>{label}</span>
+  </button>
+);
 
 export const DownloadButton: React.FC = () => {
   const qrStore = useQRStore();
@@ -49,6 +67,7 @@ export const DownloadButton: React.FC = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      toast.success(`${format.toUpperCase()}画像をダウンロードしました`);
     } catch (error) {
       console.error('Download failed:', error);
       toast.error('ダウンロードに失敗しました');
@@ -123,6 +142,7 @@ export const DownloadButton: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      toast.success('SVG画像をダウンロードしました');
     } catch (error) {
       console.error('SVG download failed:', error);
       toast.error('SVGのダウンロードに失敗しました');
@@ -154,10 +174,13 @@ export const DownloadButton: React.FC = () => {
           text: qrStore.url,
           files: [file],
         });
+        toast.success('共有しました');
       }
     } catch (error) {
+      // ユーザーが共有をキャンセルした場合（AbortError）は通知しない
       if (error instanceof Error && error.name !== 'AbortError') {
         console.error('Share failed:', error);
+        toast.error('共有に失敗しました');
       }
     }
   };
@@ -167,87 +190,58 @@ export const DownloadButton: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* メインダウンロードボタン群 */}
-      <div className="grid grid-cols-2 gap-3">
-        <Button
-          onClick={() => handleDownload('png')}
-          disabled={isDisabled || isDownloading}
-          className="w-full min-h-[44px]"
-          size="default"
-        >
-          <Download className="w-4 h-4 mr-2" />
-          {isDownloading ? '生成中...' : 'PNG保存'}
-        </Button>
-
-        <Button
-          onClick={() => handleDownload('jpg')}
-          disabled={isDisabled || isDownloading}
-          variant="outline"
-          className="w-full min-h-[44px]"
-          size="default"
-        >
-          <Download className="w-4 h-4 mr-2" />
-          {isDownloading ? '生成中...' : 'JPG保存'}
-        </Button>
-      </div>
-
-      {/* SVGダウンロード */}
+      {/* メイン: PNGダウンロード */}
       <Button
-        onClick={handleDownloadSVG}
+        onClick={() => handleDownload('png')}
         disabled={isDisabled || isDownloading}
-        variant="outline"
-        className="w-full min-h-[44px]"
-        size="default"
+        size="lg"
+        className="w-full min-h-[48px] text-[15px]"
       >
-        <Download className="w-4 h-4 mr-2" />
-        {isDownloading ? '生成中...' : 'SVG保存（印刷・拡大対応）'}
+        <Download className="h-5 w-5" />
+        {isDownloading ? '生成中...' : 'PNGでダウンロード'}
       </Button>
 
-      {/* アクションボタン群 */}
-      <div className="grid grid-cols-2 gap-3">
-        {/* クリップボードコピー */}
-        <Button
+      {/* サブアクション（アイコンタイル） */}
+      <div className={`grid gap-2.5 ${supportsShare ? 'grid-cols-4' : 'grid-cols-3'}`}>
+        <ActionTile
+          onClick={() => handleDownload('jpg')}
+          disabled={isDisabled || isDownloading}
+          icon={<ImageIcon className="h-5 w-5" />}
+          label="JPG"
+        />
+        <ActionTile
+          onClick={handleDownloadSVG}
+          disabled={isDisabled || isDownloading}
+          icon={<FileCode className="h-5 w-5" />}
+          label="SVG"
+        />
+        <ActionTile
           onClick={handleCopyToClipboard}
           disabled={isDisabled || isDownloading}
-          variant="secondary"
-          className="w-full min-h-[44px]"
-          size="default"
-        >
-          {copySuccess ? (
-            <>
-              <CheckCircle2 className="w-4 h-4 mr-2 text-green-600" />
-              コピー完了！
-            </>
-          ) : (
-            <>
-              <Copy className="w-4 h-4 mr-2" />
-              画像をコピー
-            </>
-          )}
-        </Button>
-
-        {/* 共有ボタン（Web Share API） */}
+          icon={copySuccess ? <CheckCircle2 className="h-5 w-5 text-green-600" /> : <Copy className="h-5 w-5" />}
+          label={copySuccess ? '完了' : 'コピー'}
+        />
         {supportsShare && (
-          <Button
+          <ActionTile
             onClick={handleShare}
             disabled={isDisabled}
-            variant="secondary"
-            className="w-full min-h-[44px]"
-            size="default"
-          >
-            <Share2 className="w-4 h-4 mr-2" />
-            共有する
-          </Button>
+            icon={<Share2 className="h-5 w-5" />}
+            label="共有"
+          />
         )}
       </div>
 
       {/* ライブラリ保存 */}
-      <SaveToLibraryButton disabled={isDisabled} className="w-full min-h-[44px]" />
+      <SaveToLibraryButton
+        disabled={isDisabled}
+        variant="ghost"
+        className="w-full min-h-[44px] bg-accent text-accent-foreground hover:bg-accent/70"
+      />
 
       {/* 出力情報カード */}
-      <div className="bg-gradient-to-r from-gray-50 to-blue-50 border border-gray-200 rounded-xl p-3">
+      <div className="bg-muted/60 border border-border rounded-xl p-3">
         <div className="flex items-center space-x-2 mb-2">
-          <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <h4 className="text-sm font-semibold text-gray-800">出力情報</h4>
