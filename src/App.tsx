@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react"
-import { FileText, Image, Palette } from "lucide-react"
+import { FileText, Image, Library, Palette } from "lucide-react"
 import { Footer, Header } from "@/components/layout"
 import { UrlInput } from "@/components/forms/UrlInput"
 import { StyleSettingsForm } from "@/components/StyleSettingsForm"
@@ -9,13 +9,17 @@ import { QRPreview } from "@/components/qr/QRPreview"
 import { DownloadButton } from "@/components/qr/DownloadButton"
 import { StickyActionBar } from "@/components/qr/StickyActionBar"
 import { SettingsDialog } from "@/components/SettingsDialog"
+import { QRLibraryDialog } from "@/components/library/QRLibraryDialog"
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Toaster } from "@/components/ui/Toaster"
 import { TourGuidePage } from "@/pages/tour-guide/tour-guide-page"
 
 const QRGeneratorApp: React.FC = () => {
   const [isTourGuideOpen, setIsTourGuideOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isLibraryOpen, setIsLibraryOpen] = useState(false)
 
   const handleOpenTourGuide = useCallback(() => {
     setIsTourGuideOpen(true)
@@ -25,19 +29,39 @@ const QRGeneratorApp: React.FC = () => {
     setIsTourGuideOpen(false)
   }, [])
 
+  const libraryButton = (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => setIsLibraryOpen(true)}
+    >
+      <Library className="h-4 w-4 sm:mr-1.5" aria-hidden="true" />
+      <span className="hidden sm:inline">ライブラリ</span>
+    </Button>
+  )
+
   return (
     <div className="h-screen h-dvh flex flex-col overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 xl:min-h-screen xl:h-auto xl:overflow-auto">
+      {/* スキップリンク（キーボード利用者向け） */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-[200] focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:shadow focus:ring-2 focus:ring-blue-500"
+      >
+        メインコンテンツへスキップ
+      </a>
+
       {/* ヘッダー */}
       <div className="shrink-0 xl:fixed xl:top-0 xl:left-0 xl:right-0 xl:z-50">
         <Header
           isTourGuideOpen={isTourGuideOpen}
           onOpenTourGuide={handleOpenTourGuide}
           onCloseTourGuide={handleCloseTourGuide}
+          extraActions={!isTourGuideOpen ? libraryButton : undefined}
         />
       </div>
 
       {/* メインコンテンツ */}
-      <div className="flex-1 min-h-0 xl:pt-16 xl:pb-20">
+      <main id="main-content" tabIndex={-1} className="flex-1 min-h-0 focus:outline-none xl:pt-16 xl:pb-20">
         {isTourGuideOpen ? (
           <div className="h-full overflow-auto mx-auto w-full max-w-none px-2 sm:px-4 lg:px-6 xl:px-8">
             <TourGuidePage onClose={handleCloseTourGuide} />
@@ -63,7 +87,7 @@ const QRGeneratorApp: React.FC = () => {
             <div className="hidden xl:block mx-auto w-full max-w-none px-2 sm:px-4 lg:px-6 xl:px-8">
               <div className="min-h-[calc(100vh-144px)] flex flex-col gap-4 py-4 lg:gap-6 xl:flex-row">
                 {/* 設定エリア */}
-                <div className="order-1 w-full xl:w-3/5">
+                <section aria-label="QRコード設定" className="order-1 w-full xl:w-3/5">
                   <Card className="flex min-h-full flex-col border shadow-sm">
                     <CardHeader className="pb-4">
                       <CardTitle className="text-lg font-bold sm:text-xl">
@@ -113,10 +137,10 @@ const QRGeneratorApp: React.FC = () => {
                       </CollapsibleSection>
                     </CardContent>
                   </Card>
-                </div>
+                </section>
 
                 {/* プレビューエリア */}
-                <div className="order-2 w-full xl:w-2/5">
+                <section aria-label="QRコードプレビュー" className="order-2 w-full xl:w-2/5">
                   <div className="sticky top-20">
                     <Card className="border-2 shadow-lg">
                       <CardHeader className="pb-4">
@@ -134,12 +158,12 @@ const QRGeneratorApp: React.FC = () => {
                       </CardContent>
                     </Card>
                   </div>
-                </div>
+                </section>
               </div>
             </div>
           </>
         )}
-      </div>
+      </main>
 
       {/* モバイル用: 固定アクションバー（設定/保存/コピー/共有） */}
       <StickyActionBar onOpenSettings={() => setIsSettingsOpen(true)} />
@@ -147,10 +171,16 @@ const QRGeneratorApp: React.FC = () => {
       {/* 設定ダイアログ（モバイル用） */}
       <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
 
+      {/* 保存済みQRライブラリ */}
+      <QRLibraryDialog open={isLibraryOpen} onOpenChange={setIsLibraryOpen} />
+
       {/* 固定フッター（デスクトップのみ表示） */}
       <div className="fixed bottom-0 left-0 right-0 z-50 hidden xl:block">
         <Footer />
       </div>
+
+      {/* トースト通知（アクセシブルなライブリージョン） */}
+      <Toaster />
     </div>
   );
 };

@@ -3,6 +3,8 @@ import { useQRStore } from '../../store/qrStore';
 import { generateQRCode } from '../../utils/qrGenerator';
 import { Download, Copy, Share2, CheckCircle2, Settings } from 'lucide-react';
 import { Button } from '../ui/button';
+import { SaveToLibraryButton } from './SaveToLibraryButton';
+import { toast } from '../../hooks/useToast';
 
 interface StickyActionBarProps {
   onOpenSettings?: () => void;
@@ -37,6 +39,7 @@ export const StickyActionBar: React.FC<StickyActionBarProps> = ({ onOpenSettings
       document.body.removeChild(link);
     } catch (error) {
       console.error('Download failed:', error);
+      toast.error('ダウンロードに失敗しました');
     } finally {
       setIsDownloading(false);
     }
@@ -60,15 +63,18 @@ export const StickyActionBar: React.FC<StickyActionBarProps> = ({ onOpenSettings
           ]);
           setCopySuccess(true);
           setTimeout(() => setCopySuccess(false), 2000);
+          toast.success('QRコード画像をコピーしました');
         } catch {
           // Fallback: copy text
           await navigator.clipboard.writeText(qrStore.url);
           setCopySuccess(true);
           setTimeout(() => setCopySuccess(false), 2000);
+          toast.success('URLをコピーしました');
         }
       }, 'image/png');
     } catch (error) {
       console.error('Copy failed:', error);
+      toast.error('コピーに失敗しました');
     }
   };
 
@@ -123,8 +129,15 @@ export const StickyActionBar: React.FC<StickyActionBarProps> = ({ onOpenSettings
           className="min-h-[44px] px-3"
           aria-label="設定を開く"
         >
-          <Settings className="w-5 h-5" />
+          <Settings className="w-5 h-5" aria-hidden="true" />
         </Button>
+
+        <SaveToLibraryButton
+          disabled={isDisabled}
+          variant="outline"
+          className="min-h-[44px] px-3"
+          compact
+        />
 
         <Button
           onClick={handleDownloadPNG}

@@ -62,12 +62,18 @@ export const QRPreview: React.FC = () => {
     qrStore.logoSettings,
   ]);
 
+  const trimmedUrl = (qrStore.url || '').trim();
+
   return (
-    <div className="space-y-3" data-tour="qr-preview">
+    <div className="space-y-3" data-tour="qr-preview" aria-busy={isGenerating}>
       {/* 生成状態 */}
       {isGenerating && (
-        <div className="flex items-center justify-center space-x-3 text-blue-600 bg-blue-50 border border-blue-200 rounded-lg py-2">
-          <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+        <div
+          role="status"
+          aria-live="polite"
+          className="flex items-center justify-center space-x-3 text-blue-600 bg-blue-50 border border-blue-200 rounded-lg py-2"
+        >
+          <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full" aria-hidden="true"></div>
           <span className="text-sm font-medium">QRコードを生成中...</span>
         </div>
       )}
@@ -99,7 +105,7 @@ export const QRPreview: React.FC = () => {
             </div>
           </div>
         ) : error ? (
-          <div className="flex items-center justify-center aspect-square max-h-64 xl:h-64 bg-red-50 border-2 border-dashed border-red-300 rounded-lg">
+          <div role="alert" className="flex items-center justify-center aspect-square max-h-64 xl:h-64 bg-red-50 border-2 border-dashed border-red-300 rounded-lg">
             <div className="text-center px-4">
               <svg
                 className="w-10 h-10 xl:w-12 xl:h-12 text-red-400 mx-auto mb-2"
@@ -130,6 +136,12 @@ export const QRPreview: React.FC = () => {
               )}
               <canvas
                 ref={canvasRef}
+                role="img"
+                aria-label={
+                  trimmedUrl
+                    ? `「${trimmedUrl}」のQRコード`
+                    : '生成されたQRコード'
+                }
                 className="max-w-full h-auto rounded-lg shadow-md border border-gray-200"
                 style={{ maxHeight: '300px', maxWidth: '300px' }}
               />
