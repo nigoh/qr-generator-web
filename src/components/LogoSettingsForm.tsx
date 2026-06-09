@@ -7,6 +7,9 @@ import { Button } from './ui';
 import { extractQRColorsFromImage } from '../utils/colorUtils';
 import { toast } from '../hooks/useToast';
 
+/** ロゴ画像の最大アップロードサイズ(5MB)。巨大画像による canvas 処理の停止を防ぐ。 */
+const MAX_LOGO_SIZE_BYTES = 5 * 1024 * 1024;
+
 export const LogoSettingsForm: React.FC = () => {
   const {
     logoFile,
@@ -68,6 +71,8 @@ export const LogoSettingsForm: React.FC = () => {
           onChange={handleLogoUpload}
           preview={logoPreview}
           label="ロゴ画像をアップロード"
+          maxSizeBytes={MAX_LOGO_SIZE_BYTES}
+          onError={toast.error}
         />
       </div>
 

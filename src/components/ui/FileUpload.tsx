@@ -9,6 +9,10 @@ interface FileUploadProps {
   disabled?: boolean;
   multiple?: boolean;
   preview?: string | null;
+  /** 受け付ける最大ファイルサイズ(バイト)。超過時は onChange を呼ばず onError を通知する。 */
+  maxSizeBytes?: number;
+  /** バリデーションエラー時のメッセージ通知（トースト表示などに利用） */
+  onError?: (message: string) => void;
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({
@@ -19,6 +23,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   disabled = false,
   multiple = false,
   preview,
+  maxSizeBytes,
+  onError,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const reactId = useId();
@@ -27,6 +33,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
+    if (file && maxSizeBytes && file.size > maxSizeBytes) {
+      const limitMB = Math.round(maxSizeBytes / (1024 * 1024));
+      onError?.(`ファイルサイズが大きすぎます（上限 ${limitMB}MB）。別の画像を選択してください。`);
+      // 同じファイルを再選択できるよう入力値をリセットする
+      e.target.value = '';
+      return;
+    }
     onChange(file);
   };
 
@@ -121,6 +134,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       {/* ヘルプテキスト */}
       <p id={helpId} className="text-xs text-gray-500">
         対応形式: PNG, JPG, GIF, SVG （推奨: 正方形で透明背景のPNG）
+        {maxSizeBytes
+          ? `／最大 ${Math.round(maxSizeBytes / (1024 * 1024))}MB`
+          : ''}
       </p>
     </div>
   );
