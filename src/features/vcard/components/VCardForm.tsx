@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Input, Label, Textarea } from '@/components/ui';
-import { buildVCardString } from '../utils/vcard-utils';
+import { buildVCardString, isVCardFilled } from '../utils/vcard-utils';
 import type { VCardData } from '../types';
 import { VCARD_INITIAL } from '../types';
+
+/** vCardデータを通知用文字列へ変換する。1項目も入力が無ければ空文字を返し、
+ *  空のQR（BEGIN:VCARD…END:VCARDだけ）が生成されるのを防ぐ。 */
+const toVCardOutput = (data: VCardData): string =>
+  isVCardFilled(data) ? buildVCardString(data) : '';
 
 interface VCardFormProps {
   /** vCard文字列が変わるたびに呼ばれるコールバック */
@@ -17,14 +22,14 @@ export const VCardForm: React.FC<VCardFormProps> = ({ onChange }) => {
   ) => {
     setData((prev) => {
       const next = { ...prev, [field]: e.target.value };
-      onChange(buildVCardString(next));
+      onChange(toVCardOutput(next));
       return next;
     });
   };
 
-  // 初回マウント時にも空vCardを通知
+  // 初回マウント時にも通知（未入力なら空文字＝QRは生成されない）
   useEffect(() => {
-    onChange(buildVCardString(data));
+    onChange(toVCardOutput(data));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -41,6 +46,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ onChange }) => {
               value={data.lastName}
               onChange={update('lastName')}
               placeholder="山田"
+              maxLength={100}
             />
           </div>
           <div>
@@ -50,6 +56,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ onChange }) => {
               value={data.firstName}
               onChange={update('firstName')}
               placeholder="太郎"
+              maxLength={100}
             />
           </div>
         </div>
@@ -61,6 +68,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ onChange }) => {
               value={data.lastNameKana}
               onChange={update('lastNameKana')}
               placeholder="やまだ"
+              maxLength={100}
             />
           </div>
           <div>
@@ -70,6 +78,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ onChange }) => {
               value={data.firstNameKana}
               onChange={update('firstNameKana')}
               placeholder="たろう"
+              maxLength={100}
             />
           </div>
         </div>
@@ -84,6 +93,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ onChange }) => {
             value={data.company}
             onChange={update('company')}
             placeholder="株式会社サンプル"
+            maxLength={100}
           />
         </div>
         <div>
@@ -93,6 +103,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ onChange }) => {
             value={data.title}
             onChange={update('title')}
             placeholder="エンジニア"
+            maxLength={100}
           />
         </div>
       </div>
@@ -107,6 +118,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ onChange }) => {
             value={data.phone}
             onChange={update('phone')}
             placeholder="090-1234-5678"
+            maxLength={40}
           />
         </div>
         <div>
@@ -117,6 +129,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ onChange }) => {
             value={data.email}
             onChange={update('email')}
             placeholder="taro@example.com"
+            maxLength={100}
           />
         </div>
       </div>
@@ -130,6 +143,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ onChange }) => {
           value={data.url}
           onChange={update('url')}
           placeholder="https://example.com"
+          maxLength={200}
         />
       </div>
 
@@ -141,6 +155,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ onChange }) => {
           value={data.address}
           onChange={update('address')}
           placeholder="東京都渋谷区〇〇 1-2-3"
+          maxLength={200}
         />
       </div>
 
@@ -153,6 +168,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ onChange }) => {
           onChange={update('note')}
           placeholder="自由記入欄"
           rows={2}
+          maxLength={500}
         />
       </div>
 

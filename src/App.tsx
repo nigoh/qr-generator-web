@@ -7,6 +7,7 @@ import { LogoSettingsForm } from "@/components/LogoSettingsForm"
 import { BasicSettingsForm } from "@/components/BasicSettingsForm"
 import { QRPreview } from "@/components/qr/QRPreview"
 import { DownloadButton } from "@/components/qr/DownloadButton"
+import { ResetButton } from "@/components/qr/ResetButton"
 import { StickyActionBar } from "@/components/qr/StickyActionBar"
 import { SettingsDialog } from "@/components/SettingsDialog"
 import { QRLibraryDialog } from "@/components/library/QRLibraryDialog"
@@ -15,11 +16,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/Toaster"
 import { TourGuidePage } from "@/pages/tour-guide/tour-guide-page"
+import { TourIntroBanner, useFirstVisit } from "@/features/tour-guide"
 
 const QRGeneratorApp: React.FC = () => {
   const [isTourGuideOpen, setIsTourGuideOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isLibraryOpen, setIsLibraryOpen] = useState(false)
+  const { isFirstVisit, dismiss: dismissFirstVisit } = useFirstVisit()
 
   const handleOpenTourGuide = useCallback(() => {
     setIsTourGuideOpen(true)
@@ -28,6 +31,14 @@ const QRGeneratorApp: React.FC = () => {
   const handleCloseTourGuide = useCallback(() => {
     setIsTourGuideOpen(false)
   }, [])
+
+  const introBanner =
+    !isTourGuideOpen && isFirstVisit ? (
+      <TourIntroBanner
+        onStart={handleOpenTourGuide}
+        onDismiss={dismissFirstVisit}
+      />
+    ) : null
 
   const libraryButton = (
     <Button
@@ -70,6 +81,9 @@ const QRGeneratorApp: React.FC = () => {
           <>
             {/* モバイル: スクロール不要の1画面レイアウト */}
             <div className="flex flex-col h-full xl:hidden">
+              {introBanner && (
+                <div className="shrink-0 px-3 pt-3">{introBanner}</div>
+              )}
               {/* URL入力エリア（コンパクト表示） */}
               <div className="shrink-0 px-3 pt-3 pb-2">
                 <UrlInput compact />
@@ -85,14 +99,18 @@ const QRGeneratorApp: React.FC = () => {
 
             {/* デスクトップ: 2カラムレイアウト（従来通り） */}
             <div className="hidden xl:block mx-auto w-full max-w-none px-2 sm:px-4 lg:px-6 xl:px-8">
+              {introBanner && <div className="pt-4">{introBanner}</div>}
               <div className="min-h-[calc(100vh-144px)] flex flex-col gap-4 py-4 lg:gap-6 xl:flex-row">
                 {/* 設定エリア */}
                 <section aria-label="QRコード設定" className="order-1 w-full xl:w-3/5">
                   <Card className="flex min-h-full flex-col border shadow-sm">
                     <CardHeader className="pb-4">
-                      <CardTitle className="text-lg font-bold sm:text-xl">
-                        QRコード設定
-                      </CardTitle>
+                      <div className="flex items-center justify-between gap-2">
+                        <CardTitle className="text-lg font-bold sm:text-xl">
+                          QRコード設定
+                        </CardTitle>
+                        <ResetButton />
+                      </div>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4 sm:space-y-6">
                       <CollapsibleSection

@@ -41,6 +41,8 @@ interface QRState {
   updateLogoSettings: (settings: Partial<LogoSettings>) => void;
   toggleLogoSection: () => void;
   toggleSettingsSection: () => void;
+  // 入力・設定を初期状態に戻す
+  resetSettings: () => void;
 
   // 設定をまとめて取得
   getQRSettings: () => QRSettings;
@@ -52,27 +54,32 @@ interface QRState {
   ) => void;
 }
 
+/** 初期状態（リセット時にも再利用する、アクションを除いたデータ部分）。 */
+const INITIAL_STATE = {
+  // 初期値（汎用URL）
+  url: DEFAULT_QR_URL,
+  errorCorrection: 'H',
+  // デフォルト色: 高コントラストで目に優しい配色（Tailwind gray-900 on gray-50 相当）
+  fgColor: '#111827',
+  bgColor: '#F9FAFB',
+  fgGradientEnd: '',
+  dotStyle: 'square',
+  boxSize: 10,
+  border: 4,
+  logoFile: null,
+  logoSettings: {
+    size: 20,
+    padding: 4,
+    radius: 100,
+  },
+  logoSectionOpen: false,
+  settingsSectionOpen: false,
+} satisfies Partial<QRState>;
+
 export const useQRStore = create<QRState>()(
   persist(
     (set, get) => ({
-      // 初期値（汎用URL）
-      url: DEFAULT_QR_URL,
-      errorCorrection: 'H',
-      // デフォルト色: 高コントラストで目に優しい配色（Tailwind gray-900 on gray-50 相当）
-      fgColor: '#111827',
-      bgColor: '#F9FAFB',
-      fgGradientEnd: '',
-      dotStyle: 'square',
-      boxSize: 10,
-      border: 4,
-      logoFile: null,
-      logoSettings: {
-        size: 20,
-        padding: 4,
-        radius: 100,
-      },
-      logoSectionOpen: false,
-      settingsSectionOpen: false,
+      ...INITIAL_STATE,
 
       // アクション
       setUrl: (url) => set({ url }),
@@ -90,9 +97,12 @@ export const useQRStore = create<QRState>()(
         })),
       toggleLogoSection: () => 
         set((state) => ({ logoSectionOpen: !state.logoSectionOpen })),
-      toggleSettingsSection: () => 
+      toggleSettingsSection: () =>
         set((state) => ({ settingsSectionOpen: !state.settingsSectionOpen })),
-      
+
+      // 入力・設定を初期状態に戻す（プレビューは自動再生成される）
+      resetSettings: () => set({ ...INITIAL_STATE }),
+
       // 設定をまとめて取得
       getQRSettings: () => {
         const state = get();

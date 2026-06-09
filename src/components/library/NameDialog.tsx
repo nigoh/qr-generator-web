@@ -10,7 +10,9 @@ interface NameDialogProps {
   description?: string;
   initialName: string;
   confirmLabel: string;
-  onConfirm: (name: string) => void;
+  /** 確定時の処理。Promiseを返すと完了まで確定ボタンが「処理中…」で無効化される。
+   *  reject するとダイアログは開いたまま（呼び出し側でエラートーストを表示し再試行可能にする）。 */
+  onConfirm: (name: string) => void | Promise<void>;
 }
 
 /**
@@ -26,6 +28,7 @@ export const NameDialog: React.FC<NameDialogProps> = ({
   onConfirm,
 }) => {
   const [name, setName] = useState(initialName);
+  const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const inputId = useId();
 
@@ -42,11 +45,19 @@ export const NameDialog: React.FC<NameDialogProps> = ({
     }
   }, [open, initialName]);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const trimmed = name.trim();
-    if (!trimmed) return;
-    onConfirm(trimmed);
-    onOpenChange(false);
+    if (!trimmed || submitting) return;
+    try {
+      setSubmitting(true);
+      await onConfirm(trimmed);
+      onOpenChange(false);
+    } catch {
+      // 失敗時はダイアログを開いたままにして再試行できるようにする
+      // （エラー通知は呼び出し側のトーストが担当）
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -69,14 +80,20 @@ export const NameDialog: React.FC<NameDialogProps> = ({
             onChange={(e) => setName(e.target.value)}
             placeholder="例: 会社サイト用QR"
             maxLength={100}
+            disabled={submitting}
           />
         </div>
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={submitting}
+          >
             キャンセル
           </Button>
-          <Button type="submit" disabled={!name.trim()}>
-            {confirmLabel}
+          <Button type="submit" disabled={!name.trim() || submitting}>
+            {submitting ? '処理中…' : confirmLabel}
           </Button>
         </div>
       </form>

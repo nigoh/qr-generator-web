@@ -49,6 +49,7 @@ export const DownloadButton: React.FC = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      toast.success(`${format.toUpperCase()}画像をダウンロードしました`);
     } catch (error) {
       console.error('Download failed:', error);
       toast.error('ダウンロードに失敗しました');
@@ -123,6 +124,7 @@ export const DownloadButton: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      toast.success('SVG画像をダウンロードしました');
     } catch (error) {
       console.error('SVG download failed:', error);
       toast.error('SVGのダウンロードに失敗しました');
@@ -154,10 +156,13 @@ export const DownloadButton: React.FC = () => {
           text: qrStore.url,
           files: [file],
         });
+        toast.success('共有しました');
       }
     } catch (error) {
+      // ユーザーが共有をキャンセルした場合（AbortError）は通知しない
       if (error instanceof Error && error.name !== 'AbortError') {
         console.error('Share failed:', error);
+        toast.error('共有に失敗しました');
       }
     }
   };

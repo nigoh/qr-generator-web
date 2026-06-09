@@ -13,6 +13,7 @@ import { BasicSettingsForm } from './BasicSettingsForm';
 import { StyleSettingsForm } from './StyleSettingsForm';
 import { LogoSettingsForm } from './LogoSettingsForm';
 import { Button } from './ui/button';
+import { ResetButton } from './qr/ResetButton';
 
 interface SettingsDialogProps {
   open: boolean;
@@ -27,13 +28,16 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <div className="flex items-center gap-2">
-            <Settings className="h-5 w-5 text-gray-600" />
-            <DialogTitle>QRコード設定</DialogTitle>
+          {/* DialogHeader は flex-row のため、タイトルと説明は縦積みのカラムでまとめる */}
+          <div className="flex min-w-0 flex-col pr-8">
+            <div className="flex min-w-0 items-center gap-2">
+              <Settings className="h-5 w-5 shrink-0 text-gray-600" />
+              <DialogTitle className="whitespace-nowrap">QRコード設定</DialogTitle>
+            </div>
+            <DialogDescription>
+              QRコードの詳細な設定を変更できます
+            </DialogDescription>
           </div>
-          <DialogDescription>
-            QRコードの詳細な設定を変更できます
-          </DialogDescription>
         </DialogHeader>
 
         <div className="px-4 py-4 space-y-4 pb-24">
@@ -56,6 +60,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                 基本設定
               </div>
             }
+            defaultOpen
             data-tour="basic-settings"
           >
             <BasicSettingsForm />
@@ -68,6 +73,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                 スタイル設定
               </div>
             }
+            defaultOpen
             data-tour="style-settings"
           >
             <StyleSettingsForm />
@@ -85,10 +91,11 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
             <LogoSettingsForm />
           </CollapsibleSection>
 
-          <div className="pt-4">
+          <div className="flex items-center gap-2 pt-4">
+            <ResetButton variant="outline" size="default" className="min-h-[44px] shrink-0" />
             <Button
               onClick={() => onOpenChange(false)}
-              className="w-full min-h-[44px]"
+              className="min-h-[44px] flex-1"
               size="default"
             >
               設定を閉じる

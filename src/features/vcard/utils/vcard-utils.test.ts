@@ -67,4 +67,8 @@ describe('isVCardFilled', () => {
   it('1フィールドでも入力があればtrue', () => {
     expect(isVCardFilled({ ...VCARD_INITIAL, firstName: '太郎' })).toBe(true);
   });
+
+  it('空白のみの入力はfalse（trim判定）', () => {
+    expect(isVCardFilled({ ...VCARD_INITIAL, company: '   ' })).toBe(false);
+  });
 });
